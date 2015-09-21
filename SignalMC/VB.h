@@ -22,6 +22,7 @@
 #include <TVector3.h>
 #include <TGenPhaseSpace.h>
 #include <TH1F.h>
+#include <TH1D.h>
 #include <TH2F.h>
 /**
    \class VB

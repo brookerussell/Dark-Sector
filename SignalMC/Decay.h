@@ -21,6 +21,7 @@
 #include <TNtuple.h>
 #include <TGenPhaseSpace.h>
 #include <TLorentzVector.h>
+#include <TVector3.h>
 #include <TH1F.h>
 #include <TH2F.h>
 /**
