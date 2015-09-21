@@ -1,0 +1,82 @@
+{
+#include "TMath.h"
+
+  gROOT->Reset();
+
+  TFile f1("TestOutput.root", "RECREATE");
+  TTree t1("t1"," ");
+
+  //const int kMaxParticles = 10000;
+  //const int kMaxVector = 3;
+
+  //int event;
+  //int nchgdpions;
+  //int nntrlpions;
+  //Double_t m[kMaxParticles][kMaxVector];
+  Int_t npiplus;
+  Float_t px;
+  Float_t py;
+  Float_t pz;
+  //Int_t id;
+  Float_t mlt;
+
+
+  t1.Branch("npiplus",&npiplus,"npiplus/I");
+  t1.Branch("mlt",&mlt,"mlt[npiplus]/I");
+  t1.Branch("px",&px,"px[npiplus]/F");
+  t1.Branch("py",&py,"py[npiplus]/F");
+  t1.Branch("pz",&pz,"pz[npiplus]/F");
+
+  TH1F *hx = new TH1F("hx", " ",60,-3,3); // momentum in GeV
+  TH1F *hy = new TH1F("hy", " ",60,-3,3);
+  TH1F *hz = new TH1F("hz", " ",110,-1,10);
+  TH1F *hmt = new TH1F("hmt", " ",40,0,40); // multiplicity
+  TFile* f = new TFile("/uboone/data/uboonerd/DarkSectorStudies/Pi0Avg/Flux.root");
+  gInterpreter->LoadMacro("/uboone/data/uboonerd/DarkSectorStudies/Pi0Avg/FluxClassh102.C");
+  FluxClassh102 reco((TNtuple*)(f->Get("h102")));
+  f1->cd();
+
+  int ctr = 0;
+  Int_t evt = Int_t((reco.fChain)->GetEntriesFast());
+  for(Int_t a = 0; a<10000; a++)
+    {
+      reco.GetEntry(a);
+      for(Int_t b=0; b < reco.nmult; b++)
+	{
+	  if(reco.id[b] == 211)
+	    {
+	      px = reco.mom[b][0];
+	      py = reco.mom[b][1];
+	      pz = reco.mom[b][2];
+	      mlt = reco.nmult[b];
+	      hx->Fill(px);
+	      hy->Fill(py);
+	      hz->Fill(pz);
+	      hmt->Fill(mlt);
+ //	      Double_t xmom = reco.mom[a][0];
+              //Double_t ymom = reco.mom[a][1];
+              //Double_t zmom = reco.mom[a][2];
+              //Double_t mom = sqrt(xmom*xmom+ymom*ymom+zmom*zmom);
+	      //hpp->Fill(mom);
+	      //t1->Fill();
+	      ctr++;
+	    } // <-- end of pi+ if loop
+	} // <-- end b for loop
+      if(ctr>0)
+	{
+	  npiplus = ctr;
+	  t1->Fill();
+	}
+} // <-- end of a for loop
+  //if(ctr>0)
+  //{
+      //std::cout<< "sum of multiplicities for Pi+:"<<ctr<<std::endl;
+      //std::cout<< "total number of events:"<<evt<<std::endl;
+      //std::cout<< "multiplicity per reaction:"<<ctr/evt<<std::endl;
+//t1->Fill();
+  //}
+    }
+  f1.Write();  
+f.Close();
+  //  f1.Write();
+} // <-- end of file
