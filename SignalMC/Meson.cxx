@@ -79,10 +79,10 @@ void Meson::SetParams()
 	    float iE = sqrt(0.139*0.139+mM*mM);
 	    // proceed if the inferred energy is greater than
 	    // the mass of the "new" meson
-	    if(iE-fM>0)
+	    if((iE*iE)>(fM*fM))
 	      {
-		float fakeE = iE-fM; // meson energy
-		float fakePnew = sqrt(fakeE*fakeE+fM*fM); // meson 3-momentum
+		float fakePnew = sqrt((iE*iE)-(fM*fM)); // meson 3-momentum
+		float fakeE = sqrt(fakePnew*fakePnew+fM*fM); // meson energy
 		// assign meson component momentum (e.g. px, py, pz)
 		//in a similar ratio as original pi0 component momentum
 		float fakePx = (fakePnew*neutral_mom[0])/mM; 

@@ -9,8 +9,6 @@
 #pragma link off all classes;
 #pragma link off all functions;
 
-#pragma link C++ class test+;
-#pragma link C++ class ertool::ERAnaTrial+;
 #pragma link C++ class LeptophobicMC+;
 #pragma link C++ class Meson+;
 #pragma link C++ class VB+;

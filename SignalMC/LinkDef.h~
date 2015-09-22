@@ -9,6 +9,17 @@
 #pragma link off all classes;
 #pragma link off all functions;
 
-#pragma link C++ class sample+;
+#pragma link C++ class test+;
+#pragma link C++ class LeptophobicMC+;
+#pragma link C++ class Meson+;
+#pragma link C++ class VB+;
+#pragma link C++ class Decay+;
+#pragma link C++ class ProductionCheck+;
 //ADD_NEW_CLASS ... do not change this line
 #endif
+
+
+
+
+
+

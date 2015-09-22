@@ -39,103 +39,12 @@ namespace std {} using namespace std;
 
 // Header files passed as explicit arguments
 #include "Decay.h"
-#include "ERAnaTrial.h"
 #include "LeptophobicMC.h"
 #include "Meson.h"
+#include "ProductionCheck.h"
 #include "VB.h"
-#include "test.h"
 
 // Header files passed via #pragma extra_include
-
-namespace ROOT {
-   static TClass *test_Dictionary();
-   static void test_TClassManip(TClass*);
-   static void *new_test(void *p = 0);
-   static void *newArray_test(Long_t size, void *p);
-   static void delete_test(void *p);
-   static void deleteArray_test(void *p);
-   static void destruct_test(void *p);
-
-   // Function generating the singleton type initializer
-   static TGenericClassInfo *GenerateInitInstanceLocal(const ::test*)
-   {
-      ::test *ptr = 0;
-      static ::TVirtualIsAProxy* isa_proxy = new ::TIsAProxy(typeid(::test));
-      static ::ROOT::TGenericClassInfo 
-         instance("test", "test.h", 23,
-                  typeid(::test), DefineBehavior(ptr, ptr),
-                  &test_Dictionary, isa_proxy, 4,
-                  sizeof(::test) );
-      instance.SetNew(&new_test);
-      instance.SetNewArray(&newArray_test);
-      instance.SetDelete(&delete_test);
-      instance.SetDeleteArray(&deleteArray_test);
-      instance.SetDestructor(&destruct_test);
-      return &instance;
-   }
-   TGenericClassInfo *GenerateInitInstance(const ::test*)
-   {
-      return GenerateInitInstanceLocal((::test*)0);
-   }
-   // Static variable to force the class initialization
-   static ::ROOT::TGenericClassInfo *_R__UNIQUE_(Init) = GenerateInitInstanceLocal((const ::test*)0x0); R__UseDummy(_R__UNIQUE_(Init));
-
-   // Dictionary for non-ClassDef classes
-   static TClass *test_Dictionary() {
-      TClass* theClass =::ROOT::GenerateInitInstanceLocal((const ::test*)0x0)->GetClass();
-      test_TClassManip(theClass);
-   return theClass;
-   }
-
-   static void test_TClassManip(TClass* ){
-   }
-
-} // end of namespace ROOT
-
-namespace ROOT {
-   static TClass *ertoolcLcLERAnaTrial_Dictionary();
-   static void ertoolcLcLERAnaTrial_TClassManip(TClass*);
-   static void *new_ertoolcLcLERAnaTrial(void *p = 0);
-   static void *newArray_ertoolcLcLERAnaTrial(Long_t size, void *p);
-   static void delete_ertoolcLcLERAnaTrial(void *p);
-   static void deleteArray_ertoolcLcLERAnaTrial(void *p);
-   static void destruct_ertoolcLcLERAnaTrial(void *p);
-
-   // Function generating the singleton type initializer
-   static TGenericClassInfo *GenerateInitInstanceLocal(const ::ertool::ERAnaTrial*)
-   {
-      ::ertool::ERAnaTrial *ptr = 0;
-      static ::TVirtualIsAProxy* isa_proxy = new ::TIsAProxy(typeid(::ertool::ERAnaTrial));
-      static ::ROOT::TGenericClassInfo 
-         instance("ertool::ERAnaTrial", "ERAnaTrial.h", 26,
-                  typeid(::ertool::ERAnaTrial), DefineBehavior(ptr, ptr),
-                  &ertoolcLcLERAnaTrial_Dictionary, isa_proxy, 4,
-                  sizeof(::ertool::ERAnaTrial) );
-      instance.SetNew(&new_ertoolcLcLERAnaTrial);
-      instance.SetNewArray(&newArray_ertoolcLcLERAnaTrial);
-      instance.SetDelete(&delete_ertoolcLcLERAnaTrial);
-      instance.SetDeleteArray(&deleteArray_ertoolcLcLERAnaTrial);
-      instance.SetDestructor(&destruct_ertoolcLcLERAnaTrial);
-      return &instance;
-   }
-   TGenericClassInfo *GenerateInitInstance(const ::ertool::ERAnaTrial*)
-   {
-      return GenerateInitInstanceLocal((::ertool::ERAnaTrial*)0);
-   }
-   // Static variable to force the class initialization
-   static ::ROOT::TGenericClassInfo *_R__UNIQUE_(Init) = GenerateInitInstanceLocal((const ::ertool::ERAnaTrial*)0x0); R__UseDummy(_R__UNIQUE_(Init));
-
-   // Dictionary for non-ClassDef classes
-   static TClass *ertoolcLcLERAnaTrial_Dictionary() {
-      TClass* theClass =::ROOT::GenerateInitInstanceLocal((const ::ertool::ERAnaTrial*)0x0)->GetClass();
-      ertoolcLcLERAnaTrial_TClassManip(theClass);
-   return theClass;
-   }
-
-   static void ertoolcLcLERAnaTrial_TClassManip(TClass* ){
-   }
-
-} // end of namespace ROOT
 
 namespace ROOT {
    static TClass *LeptophobicMC_Dictionary();
@@ -318,46 +227,49 @@ namespace ROOT {
 } // end of namespace ROOT
 
 namespace ROOT {
-   // Wrappers around operator new
-   static void *new_test(void *p) {
-      return  p ? new(p) ::test : new ::test;
-   }
-   static void *newArray_test(Long_t nElements, void *p) {
-      return p ? new(p) ::test[nElements] : new ::test[nElements];
-   }
-   // Wrapper around operator delete
-   static void delete_test(void *p) {
-      delete ((::test*)p);
-   }
-   static void deleteArray_test(void *p) {
-      delete [] ((::test*)p);
-   }
-   static void destruct_test(void *p) {
-      typedef ::test current_t;
-      ((current_t*)p)->~current_t();
-   }
-} // end of namespace ROOT for class ::test
+   static TClass *ProductionCheck_Dictionary();
+   static void ProductionCheck_TClassManip(TClass*);
+   static void *new_ProductionCheck(void *p = 0);
+   static void *newArray_ProductionCheck(Long_t size, void *p);
+   static void delete_ProductionCheck(void *p);
+   static void deleteArray_ProductionCheck(void *p);
+   static void destruct_ProductionCheck(void *p);
 
-namespace ROOT {
-   // Wrappers around operator new
-   static void *new_ertoolcLcLERAnaTrial(void *p) {
-      return  p ? ::new((::ROOT::TOperatorNewHelper*)p) ::ertool::ERAnaTrial : new ::ertool::ERAnaTrial;
+   // Function generating the singleton type initializer
+   static TGenericClassInfo *GenerateInitInstanceLocal(const ::ProductionCheck*)
+   {
+      ::ProductionCheck *ptr = 0;
+      static ::TVirtualIsAProxy* isa_proxy = new ::TIsAProxy(typeid(::ProductionCheck));
+      static ::ROOT::TGenericClassInfo 
+         instance("ProductionCheck", "ProductionCheck.h", 30,
+                  typeid(::ProductionCheck), DefineBehavior(ptr, ptr),
+                  &ProductionCheck_Dictionary, isa_proxy, 4,
+                  sizeof(::ProductionCheck) );
+      instance.SetNew(&new_ProductionCheck);
+      instance.SetNewArray(&newArray_ProductionCheck);
+      instance.SetDelete(&delete_ProductionCheck);
+      instance.SetDeleteArray(&deleteArray_ProductionCheck);
+      instance.SetDestructor(&destruct_ProductionCheck);
+      return &instance;
    }
-   static void *newArray_ertoolcLcLERAnaTrial(Long_t nElements, void *p) {
-      return p ? ::new((::ROOT::TOperatorNewHelper*)p) ::ertool::ERAnaTrial[nElements] : new ::ertool::ERAnaTrial[nElements];
+   TGenericClassInfo *GenerateInitInstance(const ::ProductionCheck*)
+   {
+      return GenerateInitInstanceLocal((::ProductionCheck*)0);
    }
-   // Wrapper around operator delete
-   static void delete_ertoolcLcLERAnaTrial(void *p) {
-      delete ((::ertool::ERAnaTrial*)p);
+   // Static variable to force the class initialization
+   static ::ROOT::TGenericClassInfo *_R__UNIQUE_(Init) = GenerateInitInstanceLocal((const ::ProductionCheck*)0x0); R__UseDummy(_R__UNIQUE_(Init));
+
+   // Dictionary for non-ClassDef classes
+   static TClass *ProductionCheck_Dictionary() {
+      TClass* theClass =::ROOT::GenerateInitInstanceLocal((const ::ProductionCheck*)0x0)->GetClass();
+      ProductionCheck_TClassManip(theClass);
+   return theClass;
    }
-   static void deleteArray_ertoolcLcLERAnaTrial(void *p) {
-      delete [] ((::ertool::ERAnaTrial*)p);
+
+   static void ProductionCheck_TClassManip(TClass* ){
    }
-   static void destruct_ertoolcLcLERAnaTrial(void *p) {
-      typedef ::ertool::ERAnaTrial current_t;
-      ((current_t*)p)->~current_t();
-   }
-} // end of namespace ROOT for class ::ertool::ERAnaTrial
+
+} // end of namespace ROOT
 
 namespace ROOT {
    // Wrappers around operator new
@@ -443,15 +355,35 @@ namespace ROOT {
    }
 } // end of namespace ROOT for class ::Decay
 
+namespace ROOT {
+   // Wrappers around operator new
+   static void *new_ProductionCheck(void *p) {
+      return  p ? new(p) ::ProductionCheck : new ::ProductionCheck;
+   }
+   static void *newArray_ProductionCheck(Long_t nElements, void *p) {
+      return p ? new(p) ::ProductionCheck[nElements] : new ::ProductionCheck[nElements];
+   }
+   // Wrapper around operator delete
+   static void delete_ProductionCheck(void *p) {
+      delete ((::ProductionCheck*)p);
+   }
+   static void deleteArray_ProductionCheck(void *p) {
+      delete [] ((::ProductionCheck*)p);
+   }
+   static void destruct_ProductionCheck(void *p) {
+      typedef ::ProductionCheck current_t;
+      ((current_t*)p)->~current_t();
+   }
+} // end of namespace ROOT for class ::ProductionCheck
+
 namespace {
   void TriggerDictionaryInitialization_libDarkSector_SignalMC_Impl() {
     static const char* headers[] = {
 "Decay.h",
-"ERAnaTrial.h",
 "LeptophobicMC.h",
 "Meson.h",
+"ProductionCheck.h",
 "VB.h",
-"test.h",
 0
     };
     static const char* includePaths[] = {
@@ -467,12 +399,11 @@ R"DICTFWDDCLS(
 #pragma clang diagnostic ignored "-Wignored-attributes"
 #pragma clang diagnostic ignored "-Wreturn-type-c-linkage"
 extern int __Cling_Autoloading_Map;
-class __attribute__((annotate("$clingAutoload$test.h")))  test;
-namespace ertool{class __attribute__((annotate("$clingAutoload$ERAnaTrial.h")))  ERAnaTrial;}
 class __attribute__((annotate("$clingAutoload$LeptophobicMC.h")))  LeptophobicMC;
 class __attribute__((annotate("$clingAutoload$Meson.h")))  Meson;
 class __attribute__((annotate("$clingAutoload$VB.h")))  VB;
 class __attribute__((annotate("$clingAutoload$Decay.h")))  Decay;
+class __attribute__((annotate("$clingAutoload$ProductionCheck.h")))  ProductionCheck;
 )DICTFWDDCLS";
     static const char* payloadCode = R"DICTPAYLOAD(
 
@@ -482,11 +413,10 @@ class __attribute__((annotate("$clingAutoload$Decay.h")))  Decay;
 
 #define _BACKWARD_BACKWARD_WARNING_H
 #include "Decay.h"
-#include "ERAnaTrial.h"
 #include "LeptophobicMC.h"
 #include "Meson.h"
+#include "ProductionCheck.h"
 #include "VB.h"
-#include "test.h"
 
 #undef  _BACKWARD_BACKWARD_WARNING_H
 )DICTPAYLOAD";
@@ -494,9 +424,8 @@ class __attribute__((annotate("$clingAutoload$Decay.h")))  Decay;
 "Decay", payloadCode, "@",
 "LeptophobicMC", payloadCode, "@",
 "Meson", payloadCode, "@",
+"ProductionCheck", payloadCode, "@",
 "VB", payloadCode, "@",
-"ertool::ERAnaTrial", payloadCode, "@",
-"test", payloadCode, "@",
 nullptr};
 
     static bool isInitialized = false;

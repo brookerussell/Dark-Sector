@@ -13,11 +13,11 @@ c.AddFile("Woburn.root");
 d=VB()
 d.PseudoscalarMeson()
 
-e=TChain("k","")
-e.AddFile("Stoneham.root")
+#e=TChain("k","")
+#e.AddFile("Stoneham.root")
 
-f=Decay()
-f.Detector()
+#f=Decay()
+#f.Detector()
 
 #g=TChain("np","")
 #g.AddFile("PiNtuple.root")

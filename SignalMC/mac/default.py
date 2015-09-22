@@ -1,17 +1,17 @@
 import sys
 from ROOT import *
 
-a=TChain("np","")
-a.AddFile("PiNtuple.root")
+#a=TChain("np","")
+#a.AddFile("PiNtuple.root")
 
-b=Meson()
-b.SetParams()
+#b=Meson()
+#b.SetParams()
 
-#c=TChain("l","")
-#c.AddFile("Woburn.root");
+c=TChain("l","")
+c.AddFile("Woburn.root");
 
-#d=VB()
-#d.PseudoscalarMeson()
+d=VB()
+d.PseudoscalarMeson()
 
 #e=TChain("k","")
 #e.AddFile("Stoneham.root")

@@ -74,6 +74,7 @@ void VB::PseudoscalarMeson()
   TH1F *rpe = new TH1F("rpe", "#gamma Energy (rest frame)",400,-2,2);
   int ctr = 0;
   int dtr = 0;
+  TLorentzVector com, zero_m;
   Int_t mentries = (Int_t)l->GetEntries();
   for(Int_t i=0; i<mentries; i++)
   //  for(Int_t i=0; i<10000; i++)
@@ -82,26 +83,43 @@ void VB::PseudoscalarMeson()
       vxlf = mx; // meson lab frame momentum components 
       vylf = my;
       vzlf = mz;
+      //std::cout << "E= "<< me << " PX= "<< mx << " PY= " << my << " PZ = " << mz << std::endl; 
       velf = me; // meson energy lab frame
       vl = sqrt(mx*mx+my*my+mz*mz); // meson lab frame 3-momentum
       TLorentzVector meson_lf;
       meson_lf.SetPxPyPzE(mx,my,mz,me);
-      float vlfinv = meson_lf.Mag(); //meson lab frame invariant mass
-      vlf->Fill(std::abs(vlfinv));
-      
+      //float vlfinv = meson_lf.M(); //meson lab frame invariant mass
+      float vlfinv = meson_lf.Mag();
+      vlf->Fill(vlfinv);
+      std::cout << "LF = " << vlf << std::endl;
+      zero_m.SetPxPyPzE(0,0,0,0);
+      com = meson_lf + zero_m;
       // boost meson to its rest frame
-      meson_lf.Boost(-meson_lf.Px()/meson_lf.E(),
-		     -meson_lf.Py()/meson_lf.E(),
-		     -meson_lf.Px()/meson_lf.E());
-      vxrf = meson_lf.Px(); // meson rest fram momentum components
-      vyrf = meson_lf.Py();
-      vzrf = meson_lf.Pz();
-      verf = meson_lf.E(); // meson energy rest frame
+      meson_lf.Boost(-com.BoostVector());
+      //meson_lf.Boost(-meson_lf.Px()/meson_lf.E(),
+      //	     -meson_lf.Py()/meson_lf.E(),
+      //	     -meson_lf.Px()/meson_lf.E());
+      TLorentzVector meson_rf;
+      meson_rf.SetPxPyPzE(meson_lf[0],
+			  meson_lf[1],
+			  meson_lf[2],
+			  meson_lf[3]);
+      //vxrf = meson_lf.Px(); // meson rest fram momentum components
+      //vyrf = meson_lf.Py();
+      //vzrf = meson_lf.Pz();
+      vxrf = meson_rf[0];
+      vyrf = meson_rf[1];
+      vzrf = meson_rf[2];
+      verf = meson_rf[3];
+      //std::cout<<"Rest frame IV:" << vxrf << vyrf << vzrf << std::endl;
+      //verf = meson_lf.E(); // meson energy rest frame
       vr = sqrt(meson_lf.Px()*meson_lf.Px()
 		+meson_lf.Py()*meson_lf.Py()
 		+meson_lf.Pz()*meson_lf.Pz()); //
-      float vrfinv = meson_lf.Mag(); // meson rest frame invariant mass
+      float vrfinv = meson_rf.Mag(); // meson rest frame invariant mass
       vrf->Fill(std::abs(vrfinv));
+      std::cout<< "RF = " << vrf << std::endl;
+      if (vlf == vrf) {std::cout<<"lab frame: "<< vlf<<" rest frame: "<< vrf<<std::endl;}
       if (mid == 1 || mid == 4)
 	{
 	  TLorentzVector meson_rf;

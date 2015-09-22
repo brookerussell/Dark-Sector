@@ -4,7 +4,7 @@
 #include "ProductionCheck.h"
 void ProductionCheck::CheckAll()
 {
-  TFile* f = new TFile("Woburn.root");
+  /*  TFile* f = new TFile("Woburn.root");
   TTree *l = new (TTree*)f->Get("l");
   const int kMaxParticles = 10000;
   l->SetBranchAddress("mesons",&mesons);
@@ -31,7 +31,7 @@ void ProductionCheck::CheckAll()
   k->SetBranchAddress("velf",&velf);
   k->SetBranchAddress("vxrf",&vxrf);
   k->SetBranchAddress("vyrf",&vyrf);
-  k->SetBranchAddress("vzrf",&vzrf);
+  k->SetBranchAddress("vzrf",&vzrf);*/
 }
 
 
