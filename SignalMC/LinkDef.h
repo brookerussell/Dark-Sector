@@ -15,8 +15,10 @@
 #pragma link C++ class Meson+;
 #pragma link C++ class VB+;
 #pragma link C++ class Decay+;
+#pragma link C++ class ProductionCheck+;
 //ADD_NEW_CLASS ... do not change this line
 #endif
+
 
 
 

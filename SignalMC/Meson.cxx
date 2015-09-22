@@ -24,8 +24,8 @@ void Meson::SetParams()
   l.Branch("me",&me,"me/F"); // energy
   l.Branch("mnew",&mnew,"mnew/F"); //3-momentum
   l.Branch("mass",&mass,"mass/F"); //meson mass
-  TH1F *x = new TH1F("x","P_{x}",200,-1,1);
-  TH1F *y = new TH1F("y","P_{y}",200,-1,1);
+  TH1F *x = new TH1F("x","P_{x}",400,-2,2);
+  TH1F *y = new TH1F("y","P_{y}",400,-2,2);
   TH1F *z = new TH1F("z","P_{z}",800,0,8); 
   TH1F *e = new TH1F("e","Energy",800,0,8);
   TH1F *m = new TH1F("m","Mass",1100,0,1.1);

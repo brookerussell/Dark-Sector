@@ -1,0 +1,11 @@
+#ifndef PRODUCTIONCHECK_CXX
+#define PRODUCTIONCHECK_CXX
+
+#include "ProductionCheck.h"
+void ProductionCheck::CheckAll()
+{
+
+}
+
+
+#endif

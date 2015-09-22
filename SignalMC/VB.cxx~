@@ -51,7 +51,7 @@ void VB::PseudoscalarMeson()
   TH1F *vbx = new TH1F("vbx","P_{x} (V_{B} lab frame) ",400,-2,2);
   TH1F *vby = new TH1F("vby","P_{y} (V_{B} lab frame)",400,-2,2);
   TH1F *vbz = new TH1F("vbz","P_{z} (V_{B} lab frame)",1200,-2,10);
-  TH1F *vbe = new TH1F("vbe","V_{B} Energy (lab frame)",1600,-8,8);
+  TH1F *vbe = new TH1F("vbe","V_{B} Energy (lab frame)",800,0,8);
   TH1F *vbmass = new TH1F("vbmass","V_{B} mass",1100,0,1.1); 
   TH1D *phx = new TH1D("phx","P_{x} (#gamma_{x} lab frame)",400,-2,2);
   TH1F *phy = new TH1F("phy","P_{y} (#gamma_{y} lab frame)",400,-2,2);
