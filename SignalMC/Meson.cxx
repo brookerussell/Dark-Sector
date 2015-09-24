@@ -2,28 +2,74 @@
 #define MESON_CXX
 
 #include "Meson.h"
+
+// ##########################################################################
+// ###  This code takes in the simulated Pi0 production from the BNB      ###
+// ### code and then produces the heavier mesons which could have been    ###
+// ###    created instead (e.g. eta, rho, omega, eta-prime, phi)          ###
+// ###                                                                    ###
+// ###      Once created, it then distributes the remaining energy and    ###
+// ### momentum such that Px_initial / Ptot_inital = Px_final/ Ptot_final ###
+// ##########################################################################
+
 void Meson::SetParams()
 {
+  // ####################################################
+  // ### Opening the Pion Ntuple (note this file must ###
+  // ###    match what is set in mac/default.py       ###
+  // ####################################################
   TFile* f = new TFile("PiNtuple.root");
   TTree *np = (TTree*)f->Get("np");
+  
+  
+  // ### Grabbing the variables for the Pi0 ###
   const int kMaxParticles = 10000;
   Int_t npizero;
   Float_t neutral_mom[kMaxParticles];
-  np->SetBranchAddress("npizero",&npizero);
-  np->SetBranchAddress("neutral_mom",&neutral_mom);
+  
+  // ### Grabbing the branches from TFile f for the Pi0 ###
+  np->SetBranchAddress("npizero",&npizero); 		//<--- Number of Pi0's in ntuple
+  np->SetBranchAddress("neutral_mom",&neutral_mom);	//<--- Pi0 3-momentum
 
+  // #################################################################################
+  // ###   Creating a file which will output the results of running this script    ###
+  // ### Namely, the information about the created eta, rho, omega, eta-prime, phi ###
+  // #################################################################################
   TFile* fout = TFile::Open("Woburn.root","RECREATE");
-  TTree l("l","");
-  int mesons;
-  float mid,mx,my,mz,me,mnew,mass;
-  l.Branch("mesons",&mesons,"mesons/I");
-  l.Branch("mid",&mid,"mid/F"); // meson id
-  l.Branch("mx",&mx,"mx/F"); //x-momentum
-  l.Branch("my",&my,"my/F");
-  l.Branch("mz",&mz,"mz/F");
-  l.Branch("me",&me,"me/F"); // energy
-  l.Branch("mnew",&mnew,"mnew/F"); //3-momentum
-  l.Branch("mass",&mass,"mass/F"); //meson mass
+  TTree l("l",""); //<---Tree name "l"
+  
+  
+  // ### Useful variables for storing the created ###
+  int nMesons;
+  float mesonID,mesonPx,mesonPy,mesonPz,mesonE,mesonPnew,mesonMass;
+  
+  // ### Number of newly created mesons ### 
+  l.Branch("nMesons",&nMesons,"nMesons/I");
+  
+  // ### Meson ID: Eta == 1, Omega == 2, Rho == 3, Eta-prime == 4, Phi == 5 ###
+  l.Branch("mesonID",&mesonID,"mesonID/F"); // meson id
+  
+  // ### Meson Px (GeV) ###
+  l.Branch("mesonPx",&mesonPx,"mesonPx/F"); 
+  
+  // ### Meson Py (GeV) ###
+  l.Branch("mesonPy",&mesonPy,"mesonPy/F");
+  
+  // ### Meson Pz (GeV) ###
+  l.Branch("mesonPz",&mesonPz,"mesonPz/F");
+  
+  // ### Meson Energy (GeV) ###
+  l.Branch("mesonE",&mesonE,"mesonE/F"); // energy
+  
+  // ### Meson new momentum P = E^2 - m^2 ###
+  l.Branch("mesonPnew",&mesonPnew,"mesonPnew/F"); //3-momentum
+  
+  // ### Meson mesonMass (for the newly created particle ###
+  l.Branch("mesonMass",&mesonMass,"mesonMass/F"); //meson mass
+  
+  // ########################
+  // ### Histogram Checks ###
+  // ########################
   TH1F *x = new TH1F("x","P_{x}",400,-2,2);
   TH1F *y = new TH1F("y","P_{y}",400,-2,2);
   TH1F *z = new TH1F("z","P_{z}",800,0,8); 
@@ -61,26 +107,47 @@ void Meson::SetParams()
   TH1F *invphi = new TH1F("invphi","#phi Invariant Mass",1100,0,1.1);
   TH2F *minv = new TH2F("minv","Invariant Mass vs. Mass",600,.5,1.1,600,.5,1.1);
   TH2F *oinvninv = new TH2F("oinvninv","Old I.M. vs. New I.M.",1000,.1,1.1,600,.5,1.1);
+  
+  
+  // ### counter for mesons produced ###
   int ctr = 0;
+  
+  // ### Grabbing the number of events (POT) ###
   Int_t nentries = (Int_t)np->GetEntries();
+  
+  // ###############################
+  // ### Looping over all events ###
+  // ###############################
   for(Int_t i=0; i<nentries; i++)
     {
+      
+      // ### Getting current entry for this event ###
       np->GetEntry(i);
+      
+      // ### Looping over the total number of Pi0's in the event ###
       for(Int_t j=0; j<npizero; j++)
-      {
+        {
+	// ###  Setting a vector of the mass's (in GeV) of the particles we are trying to "fake" their creation ###
+	// ###     Eta = 0.547 GeV, Omega = 0.775 GeV, Rho = 0.783 GeV, Eta-prime = 0.958 GeV, Phi = 1.02 GeV   ###
 	float fakeMass[5] = {0.54785,0.77526,0.78265,0.95778,1.019461};
+	
+	// ### Looping over all the "fake" particles we are trying to create
 	for(const auto& fM : fakeMass)
 	  {
-	    // pi0 3-momentum
+	    
+	    // ### Grabbing the Pi0 3-momentum ###
 	    float mM = sqrt(neutral_mom[0]*neutral_mom[0]+
 			    neutral_mom[1]*neutral_mom[1]+
 			    neutral_mom[2]*neutral_mom[2]);
-	    // pi0 (inferred) energy
+	    // ### Calculating the Pi0 (inferred) energy ###
 	    float iE = sqrt(0.139*0.139+mM*mM);
-	    // proceed if the inferred energy is greater than
-	    // the mass of the "new" meson
+	    
+	    
+	    // ### Proceed if the inferred energy squared is greater than ###
+	    // ###       the square of the mass of the "new" meson        ###
 	    if((iE*iE)>(fM*fM))
 	      {
+		// ### The new 3-momentum of the meson is sqrt(E^2 - m^2)
 		float fakePnew = sqrt((iE*iE)-(fM*fM)); // meson 3-momentum
 		float fakeE = sqrt(fakePnew*fakePnew+fM*fM); // meson energy
 		// assign meson component momentum (e.g. px, py, pz)
@@ -88,11 +155,11 @@ void Meson::SetParams()
 		float fakePx = (fakePnew*neutral_mom[0])/mM; 
 		float fakePy = (fakePnew*neutral_mom[1])/mM;
 		float fakePz = (fakePnew*neutral_mom[2])/mM;
-		mx = fakePx;
-		my = fakePy;
-		mz = fakePz;
-		me = fakeE;
-		mnew = fakePnew;
+		mesonPx = fakePx;
+		mesonPy = fakePy;
+		mesonPz = fakePz;
+		mesonE = fakeE;
+		mesonPnew = fakePnew;
 		float id; // meson id
 		if (fM == fakeMass[0]){ id = 1; }
 		if (fM == fakeMass[1]){ id = 2; }
@@ -103,31 +170,31 @@ void Meson::SetParams()
 		  { etmome->Fill(fakePnew,fakeE);
 		    etpxpz->Fill(fakePx,fakePz);
 		    etpypz->Fill(fakePy,fakePz);
-		    inveta->Fill(sqrt(std::abs(me*me-mnew*mnew)));}
+		    inveta->Fill(sqrt(std::abs(mesonE*mesonE-mesonPnew*mesonPnew)));}
 		if(id == 2)
-		  { invomega->Fill(sqrt(std::abs(me*me-mnew*mnew)));
+		  { invomega->Fill(sqrt(std::abs(mesonE*mesonE-mesonPnew*mesonPnew)));
 		    ommome->Fill(fakePnew,fakeE);
 		    ompxpz->Fill(fakePx,fakePz);
 		    ompypz->Fill(fakePy,fakePz);}
 		if(id == 3)
-		  { invrho->Fill(sqrt(std::abs(me*me-mnew*mnew)));
+		  { invrho->Fill(sqrt(std::abs(mesonE*mesonE-mesonPnew*mesonPnew)));
 		    rhomome->Fill(fakePnew,fakeE);
 		    rhopxpz->Fill(fakePx,fakePz);
 		    rhopypz->Fill(fakePy,fakePz);}
 		if(id == 4)
-		  { invetap->Fill(sqrt(std::abs(me*me-mnew*mnew)));
+		  { invetap->Fill(sqrt(std::abs(mesonE*mesonE-mesonPnew*mesonPnew)));
 		    etpmome->Fill(fakePnew,fakeE);
 		    etappxpz->Fill(fakePx,fakePz);
 		    etappypz->Fill(fakePy,fakePz);}
 		if(id == 5)
-		  { invphi->Fill(sqrt(std::abs(me*me-mnew*mnew)));
+		  { invphi->Fill(sqrt(std::abs(mesonE*mesonE-mesonPnew*mesonPnew)));
 		    phimome->Fill(fakePnew,fakeE);
 		    phipxpz->Fill(fakePx,fakePz);
 		    phipypz->Fill(fakePy,fakePz);}
-		minv->Fill(fM,sqrt(std::abs(me*me-mnew*mnew)));
-		oinvninv->Fill(sqrt(std::abs(iE*iE-mM*mM)),sqrt(std::abs(me*me-mnew*mnew)));
-		mass = fM;
-		mid = id;
+		minv->Fill(fM,sqrt(std::abs(mesonE*mesonE-mesonPnew*mesonPnew)));
+		oinvninv->Fill(sqrt(std::abs(iE*iE-mM*mM)),sqrt(std::abs(mesonE*mesonE-mesonPnew*mesonPnew)));
+		mesonMass = fM;
+		mesonID = id;
 		x->Fill(fakePx);
 		y->Fill(fakePy);
 		z->Fill(fakePz);
@@ -150,7 +217,7 @@ void Meson::SetParams()
       //} // end i loop
   if(ctr>0)
       {
-	mesons = ctr; // total number of mesons populated in tree
+	nMesons = ctr; // total number of mesons populated in tree
         l.Fill(); // fill the tree
       }
     } // <-- end i loop 
