@@ -120,7 +120,9 @@ void Meson::SetParams()
   // ###############################
   for(Int_t i=0; i<nentries; i++)
     {
-      
+    
+   // ### Printing Events ###
+   if(i % 10000 == 0){std::cout<<"Event = "<<i<<std::endl;}  
       // ### Getting current entry for this event ###
       np->GetEntry(i);
       
@@ -136,11 +138,11 @@ void Meson::SetParams()
 	  {
 	    
 	    // ### Grabbing the Pi0 3-momentum ###
-	    float mM = sqrt(neutral_mom[0]*neutral_mom[0]+
+	    float pi0Momentum = sqrt(neutral_mom[0]*neutral_mom[0]+
 			    neutral_mom[1]*neutral_mom[1]+
 			    neutral_mom[2]*neutral_mom[2]);
 	    // ### Calculating the Pi0 (inferred) energy ###
-	    float iE = sqrt(0.139*0.139+mM*mM);
+	    float iE = sqrt(0.139*0.139+pi0Momentum*pi0Momentum);
 	    
 	    
 	    // ### Proceed if the inferred energy squared is greater than ###
@@ -149,72 +151,126 @@ void Meson::SetParams()
 	      {
 		// ### The new 3-momentum of the meson is sqrt(E^2 - m^2)
 		float fakePnew = sqrt((iE*iE)-(fM*fM)); // meson 3-momentum
-		float fakeE = sqrt(fakePnew*fakePnew+fM*fM); // meson energy
-		// assign meson component momentum (e.g. px, py, pz)
-		//in a similar ratio as original pi0 component momentum
-		float fakePx = (fakePnew*neutral_mom[0])/mM; 
-		float fakePy = (fakePnew*neutral_mom[1])/mM;
-		float fakePz = (fakePnew*neutral_mom[2])/mM;
+		
+		// ### The new energy given the new momentum sqrt (P^2 - m^2)
+		float fakeE = sqrt( (fakePnew*fakePnew) + (fM*fM) ); // meson energy
+		
+		// ### Assigning meson component momentum (e.g. px, py, pz)  ###
+		// ### in a similar ratio as original pi0 component momentum ###
+		float fakePx = (fakePnew*neutral_mom[0])/pi0Momentum; 
+		float fakePy = (fakePnew*neutral_mom[1])/pi0Momentum;
+		float fakePz = (fakePnew*neutral_mom[2])/pi0Momentum;
+		
+		// ### Setting the branches ###
 		mesonPx = fakePx;
 		mesonPy = fakePy;
 		mesonPz = fakePz;
 		mesonE = fakeE;
 		mesonPnew = fakePnew;
+		
+		// ### Defining the id variable for a given particle we are createing ###
 		float id; // meson id
-		if (fM == fakeMass[0]){ id = 1; }
-		if (fM == fakeMass[1]){ id = 2; }
-		if (fM == fakeMass[2]){ id = 3; }
-		if (fM == fakeMass[3]){ id = 4; }
-		if (fM == fakeMass[4]){ id = 5; }
+		if (fM == fakeMass[0]){ id = 1; } //<---Eta
+		if (fM == fakeMass[1]){ id = 2; } //<---Omega
+		if (fM == fakeMass[2]){ id = 3; } //<---Rho
+		if (fM == fakeMass[3]){ id = 4; } //<---Eta-prime
+		if (fM == fakeMass[4]){ id = 5; } //<---Rho
+		
+		// ### Making Eta Histograms ###
 		if(id == 1)
-		  { etmome->Fill(fakePnew,fakeE);
-		    etpxpz->Fill(fakePx,fakePz);
-		    etpypz->Fill(fakePy,fakePz);
-		    inveta->Fill(sqrt(std::abs(mesonE*mesonE-mesonPnew*mesonPnew)));}
+		  { 
+		  // ### Defining temp invariant mass ###
+		  float tempInvMass = sqrt( (mesonE*mesonE) - (mesonPnew*mesonPnew) );
+		  etmome->Fill(fakePnew,fakeE);
+		  etpxpz->Fill(fakePx,fakePz);
+		  etpypz->Fill(fakePy,fakePz);
+		  inveta->Fill(tempInvMass);
+		  }
+		
+		// ### Making Omega Histograms ###
 		if(id == 2)
-		  { invomega->Fill(sqrt(std::abs(mesonE*mesonE-mesonPnew*mesonPnew)));
-		    ommome->Fill(fakePnew,fakeE);
-		    ompxpz->Fill(fakePx,fakePz);
-		    ompypz->Fill(fakePy,fakePz);}
+		  { 
+		  // ### Defining temp invariant mass ###
+		  float tempInvMass = sqrt( (mesonE*mesonE) - (mesonPnew*mesonPnew) );
+		  invomega->Fill(tempInvMass);
+		  ommome->Fill(fakePnew,fakeE);
+		  ompxpz->Fill(fakePx,fakePz);
+		  ompypz->Fill(fakePy,fakePz);
+		  }
+		
+		// ### Making Eta Histograms ###
 		if(id == 3)
-		  { invrho->Fill(sqrt(std::abs(mesonE*mesonE-mesonPnew*mesonPnew)));
-		    rhomome->Fill(fakePnew,fakeE);
-		    rhopxpz->Fill(fakePx,fakePz);
-		    rhopypz->Fill(fakePy,fakePz);}
+		  {
+		  // ### Defining temp invariant mass ###
+		  float tempInvMass = sqrt( (mesonE*mesonE) - (mesonPnew*mesonPnew) ); 
+		  invrho->Fill(tempInvMass);
+		  rhomome->Fill(fakePnew,fakeE);
+		  rhopxpz->Fill(fakePx,fakePz);
+		  rhopypz->Fill(fakePy,fakePz);
+		  }
+		
+		// ### Making Eta-prime Histograms ###
 		if(id == 4)
-		  { invetap->Fill(sqrt(std::abs(mesonE*mesonE-mesonPnew*mesonPnew)));
-		    etpmome->Fill(fakePnew,fakeE);
-		    etappxpz->Fill(fakePx,fakePz);
-		    etappypz->Fill(fakePy,fakePz);}
+		  { 
+		  // ### Defining temp invariant mass ###
+		  float tempInvMass = sqrt( (mesonE*mesonE) - (mesonPnew*mesonPnew) );
+		  invetap->Fill(tempInvMass);
+		  etpmome->Fill(fakePnew,fakeE);
+		  etappxpz->Fill(fakePx,fakePz);
+		  etappypz->Fill(fakePy,fakePz);
+		  }
+		
+		// ### Making phi histograms ###
 		if(id == 5)
-		  { invphi->Fill(sqrt(std::abs(mesonE*mesonE-mesonPnew*mesonPnew)));
-		    phimome->Fill(fakePnew,fakeE);
-		    phipxpz->Fill(fakePx,fakePz);
-		    phipypz->Fill(fakePy,fakePz);}
-		minv->Fill(fM,sqrt(std::abs(mesonE*mesonE-mesonPnew*mesonPnew)));
-		oinvninv->Fill(sqrt(std::abs(iE*iE-mM*mM)),sqrt(std::abs(mesonE*mesonE-mesonPnew*mesonPnew)));
+		  { 
+		  // ### Defining temp invariant mass ###
+		  float tempInvMass = sqrt( (mesonE*mesonE) - (mesonPnew*mesonPnew) );
+		  invphi->Fill(tempInvMass);
+		  phimome->Fill(fakePnew,fakeE);
+		  phipxpz->Fill(fakePx,fakePz);
+		  phipypz->Fill(fakePy,fakePz);
+		  }
+		
+		// ### Filling the TTree ###
 		mesonMass = fM;
 		mesonID = id;
+		
+		// ### Defining temp invariant mass ###
+		float tempInvMass = sqrt( (mesonE*mesonE) - (mesonPnew*mesonPnew) );
+		
+		// ### Checking the defined invariant mass versus the calculated invariant mass (sanity check) ###
+		minv->Fill(fM,tempInvMass);
+		
+		// ### Pi0 invariant mass versus new invariant mass (sanity check) ###
+		float tempPi0Mass = sqrt(iE*iE-pi0Momentum*pi0Momentum);
+		oinvninv->Fill(tempPi0Mass,tempInvMass);
+		
+		// ### More simple sanity plots ###
 		x->Fill(fakePx);
 		y->Fill(fakePy);
 		z->Fill(fakePz);
 		e->Fill(fakeE);
 		m->Fill(fM);
-		n->Fill(mM,fakePnew);
+		n->Fill(pi0Momentum,fakePnew);
 		d->Fill(id);
 		ie->Fill(id,fakeE);
 		msen->Fill(fM,fakeE);
-		momoe->Fill(mM,iE);
+		momoe->Fill(pi0Momentum,iE);
 		momne->Fill(fakePnew,fakeE);
 		opxpz->Fill(neutral_mom[0],neutral_mom[2]);
 		npxpz->Fill(fakePx,fakePz);
 		opypz->Fill(neutral_mom[1],neutral_mom[2]);
 		npypz->Fill(fakePy,fakePz);
+		
+		// ### Iterate a counter if we made a new meson ###
 		ctr++;
+		
 		} // <-- end if
 	  } // <-- end fakeMass loop 
 	} // <-- end j loop
       //} // end i loop
+  
+  // ### If we made a new meson go into this loop ###
   if(ctr>0)
       {
 	nMesons = ctr; // total number of mesons populated in tree
