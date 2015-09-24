@@ -21,7 +21,7 @@ void VB::PseudoscalarMeson()
   TFile* fout = TFile::Open("Stoneham.root","RECREATE");
   TTree k("k","");
   int vbosons,mesonMotherID;
-  double  vx,vy,vz,ve,vxlf,vylf,vzlf,velf,vxrf,vyrf,vzrf,verf,v,vl,vr,vmass,omass, px,py,pz,pe,p;
+  double  vx,vy,vz,ve,mxlf,mylf,mzlf,melf,mxrf,myrf,mzrf,merf,v,ml,mr,vmass,omass, px,py,pz,pe,p;
   k.Branch("vbosons",&vbosons,"vbosons/I");
   k.Branch("mesonMotherID",&mesonMotherID,"mesonMotherID/I");
   k.Branch("vx",&vx,"vx/D"); // lab frame vectorboson momentum
@@ -30,16 +30,16 @@ void VB::PseudoscalarMeson()
   k.Branch("ve",&ve,"ve/D"); // lab frame vectorboson energy
   k.Branch("v",&v,"v/D"); // lab frame vectorboson 3-momentum
   k.Branch("vmass",&vmass,"vmass/D"); // vectorboson mass
-  k.Branch("vxlf",&vxlf,"vxlf/D"); // lab frame initial meson momentum 
-  k.Branch("vylf",&vylf,"vylf/D");
-  k.Branch("vzlf",&vzlf,"vzlf/D");
-  k.Branch("velf",&velf,"velf/D"); // lab frame initial meson energy
-  k.Branch("vxrf",&vxrf,"vxrf/D"); // rest frame initial meson momentum 
-  k.Branch("vyrf",&vyrf,"vyrf/D");
-  k.Branch("vzrf",&vzrf,"vzrf/D");
-  k.Branch("verf",&verf,"verf/D"); // rest frame initial meson energy
-  k.Branch("vl",&vl,"vl/D"); // lab frame meson 3-momentum
-  k.Branch("vr",&vr,"vr/D"); // rest frame meson 3-momentum
+  k.Branch("mxlf",&mxlf,"mxlf/D"); // lab frame initial meson momentum 
+  k.Branch("mylf",&mylf,"mylf/D");
+  k.Branch("mzlf",&mzlf,"mzlf/D");
+  k.Branch("melf",&melf,"melf/D"); // lab frame initial meson energy
+  k.Branch("mxrf",&mxrf,"mxrf/D"); // rest frame initial meson momentum 
+  k.Branch("myrf",&myrf,"myrf/D");
+  k.Branch("mzrf",&mzrf,"mzrf/D");
+  k.Branch("merf",&merf,"merf/D"); // rest frame initial meson energy
+  k.Branch("ml",&ml,"ml/D"); // lab frame meson 3-momentum
+  k.Branch("mr",&mr,"mr/D"); // rest frame meson 3-momentum
   k.Branch("px",&px,"px/D"); // lab frame photon momentum
   k.Branch("py",&py,"py/D");
   k.Branch("pz",&pz,"pz/D");
@@ -58,8 +58,8 @@ void VB::PseudoscalarMeson()
   TH1F *phz = new TH1F("phz","P_{z} (#gamma_{z} lab frame)",400,-2,2);
   TH1D *phe = new TH1D("phe","#gamma energy (lab frame)",1600,-8,8);
   TH1F *oldmass = new TH1F("oldmass","Meson mass",600,5,1.1);
-  TH1F *vrf = new TH1F("vrf","Meson Invariant Mass (Rest Frame)",1100,0,1.1);
-  TH1F *vlf = new TH1F("vlf","Meson Invariant Mass (Lab Frame)",1100,0,1.1);
+  TH1F *mrf = new TH1F("mrf","Meson Invariant Mass (Rest Frame)",1100,0,1.1);
+  TH1F *mlf = new TH1F("mlf","Meson Invariant Mass (Lab Frame)",1100,0,1.1);
   TH1F *prf = new TH1F("prf","Photon Invariant Mass (Rest Frame)",2200,-1.1,1.1);
   TH1F *plf = new TH1F("plf","Photon Invariant Mass (Lab Frame)",2200,-1.1,1.1);
   TH1F *voblf = new TH1F("voblf","Vector Boson Invariant Mass (Lab Frame)",1100,0,1.1);
@@ -74,55 +74,42 @@ void VB::PseudoscalarMeson()
   TH1F *rpe = new TH1F("rpe", "#gamma Energy (rest frame)",400,-2,2);
   int ctr = 0;
   int dtr = 0;
-  TLorentzVector com, zero_m;
+  TLorentzVector com, zero_m, com_a, zero_a, com_b, zero_b;
   Int_t mentries = (Int_t)l->GetEntries();
   for(Int_t i=0; i<mentries; i++)
-  //  for(Int_t i=0; i<10000; i++)
   {
       l->GetEntry(i);
-      vxlf = mx; // meson lab frame momentum components 
-      vylf = my;
-      vzlf = mz;
-      std::cout << "E= "<< me << " PX= "<< mx << " PY= " << my << " PZ = " << mz << std::endl; 
-      velf = me; // meson energy lab frame
-      vl = sqrt(mx*mx+my*my+mz*mz); // meson lab frame 3-momentum
+      mxlf = mx; // meson lab frame momentum components 
+      mylf = my;
+      mzlf = mz;
+      melf = me; // meson energy lab frame
+      ml = sqrt(mx*mx+my*my+mz*mz); // meson lab frame 3-momentum
       TLorentzVector meson_lf;
       meson_lf.SetPxPyPzE(mx,my,mz,me);
-      //float vlfinv = meson_lf.M(); //meson lab frame invariant mass
-      float vlfinv = meson_lf.Mag();
-      vlf->Fill(vlfinv);
-
+      float mlfinv = meson_lf.Mag();
+      mlf->Fill(mlfinv);
       zero_m.SetPxPyPzE(0,0,0,0);
       com = meson_lf + zero_m;
       // boost meson to its rest frame
       meson_lf.Boost(-com.BoostVector());
-      //meson_lf.Boost(-meson_lf.Px()/meson_lf.E(),
-      //	     -meson_lf.Py()/meson_lf.E(),
-      //	     -meson_lf.Px()/meson_lf.E());
       TLorentzVector meson_rf;
       meson_rf.SetPxPyPzE(meson_lf[0],
 			  meson_lf[1],
 			  meson_lf[2],
 			  meson_lf[3]);
-      //vxrf = meson_lf.Px(); // meson rest fram momentum components
-      //vyrf = meson_lf.Py();
-      //vzrf = meson_lf.Pz();
-      vxrf = meson_rf[0];
-      vyrf = meson_rf[1];
-      vzrf = meson_rf[2];
-      verf = meson_rf[3];
-      std::cout<<"Rest frame momenta:" << vxrf << vyrf << vzrf << std::endl;
-      //verf = meson_lf.E(); // meson energy rest frame
-      vr = sqrt(meson_lf.Px()*meson_lf.Px()
-		+meson_lf.Py()*meson_lf.Py()
-		+meson_lf.Pz()*meson_lf.Pz()); //
-      float vrfinv = meson_rf.Mag(); // meson rest frame invariant mass
-      vrf->Fill(std::abs(vrfinv));
-      if (vlf == vrf) {std::cout<<"lab frame: "<< vlf<<" rest frame: "<< vrf<<std::endl;}
+      mxrf = meson_rf[0];
+      myrf = meson_rf[1];
+      mzrf = meson_rf[2];
+      merf = meson_rf[3];
+      mr = sqrt(meson_lf[0]*meson_lf[0]
+		+meson_lf[1]*meson_lf[1]
+		+meson_lf[2]*meson_lf[2]); //
+      float mrfinv = meson_rf.Mag(); // meson rest frame invariant mass
+      mrf->Fill(mrfinv); 
       if (mid == 1 || mid == 4)
 	{
 	  TLorentzVector meson_rf;
-	  meson_rf.SetPxPyPzE(vxrf,vyrf,vzrf,verf);
+	  meson_rf.SetPxPyPzE(mxrf,myrf,mzrf,merf);
 	  TGenPhaseSpace event_k;
 	  for(float m = 0.140; m<0.630; m+=0.010) // vector boson masses
 	    {
@@ -155,8 +142,12 @@ void VB::PseudoscalarMeson()
 		  rpy->Fill(restpy);
 		  rpz->Fill(restpz);
 		  rpe->Fill(restpe);
-		  VectorBoson_rf.Boost(VectorBoson_rf.BoostVector());
-		  PhotonInitial_rf.Boost(PhotonInitial_rf.BoostVector());
+		  /*zero_a.SetPxPyPzE(0,0,0,0);
+		  com_a = VectorBoson_rf + zero_a;
+		  VectorBoson_rf.Boost(-com_a.BoostVector());
+		  //zero_b.SetPxPyPzE(0,0,0,0);
+		  //com_b = PhotonInitial_rf + zero_b;
+		  PhotonInitial_rf.Boost(-com_a.BoostVector());
 		  TLorentzVector VectorBoson_lf;
 		  VectorBoson_lf.SetPxPyPzE(VectorBoson_rf[0],
 		  		    VectorBoson_rf[1],
@@ -168,9 +159,10 @@ void VB::PseudoscalarMeson()
 		  		    PhotonInitial_rf[2],
 		  		    PhotonInitial_rf[3]);
 		  float vm = VectorBoson_lf.Mag(); // lab frame
-		  voblf->Fill(std::abs(vm));
+		  voblf->Fill(vm);
 		  float pm = PhotonInitial_lf.Mag(); //lab frame
-		  plf->Fill(std::abs(pm));
+		  plf->Fill(pm);
+		  std::cout<<"V LF = "<<vm<<" V RF = "<<vb_rfinv<<" P LF = "<< pm <<" P RF = "<< ph_rfinv<<std::endl;
 		  vx = VectorBoson_lf.Px();
 		  vy = VectorBoson_lf.Py();
 		  vz = VectorBoson_lf.Pz();
@@ -194,11 +186,11 @@ void VB::PseudoscalarMeson()
 		  phz->Fill(pz);
 		  phe->Fill(pe);
 		  vbmass->Fill(vmass); // vectorboson mass
-		  oldmass->Fill(mass); // original mass
+		  oldmass->Fill(mass); // original mass */
 		  ctr++;
 		  // Clear all 4-momenta, otherwise a sefault will result
 		  meson_lf.Clear();
-		  meson_rf.Clear();
+		  //meson_rf.Clear();
 		  VectorBoson_rf.Clear();
 		  PhotonInitial_rf.Clear();
 		  VectorBoson_lf.Clear();
@@ -208,22 +200,31 @@ void VB::PseudoscalarMeson()
 	} // <-- end eta/eta' if
       if(mid == 2 || mid == 3 || mid == 5)
 	{
-	  vx = mx;
-	  vy = my;
-	  vz = mz;
-	  ve = me;
-	  vbx->Fill(vx);
-	  vby->Fill(vy);
-	  vbz->Fill(vz);
-	  vbe->Fill(ve);
-	  v = sqrt(vx*vx+vy*vy+vz*vz);
-	  vmass = omass;
-	  vbmass->Fill(vmass);
-	  omass = mass;
-	  oldmass->Fill(mass);
-	  mesonMotherID = mid;
-	  mesonid->Fill(mid);
-	  dtr++;
+	  for(float n = 0.140; n < 0.630; n+=0.010)
+	    {
+	      // vector boson (inferred) energy
+	      float iE = sqrt((n*n)+(mnew*mnew));
+	      if((iE*iE)>(n*n))
+		{
+		  v = sqrt((iE*iE)-(n*n)); // vector boson 3-momentum
+		  ve = sqrt((v*v)+(n*n)); // vector boson energy
+		  // assign vector boson component momentum (respecting ratio of original meson)
+		  vx = (v*mx)/mnew;
+		  vy = (v*my)/mnew;
+		  vz = (v*mz)/mnew;
+		  vmass = n;
+		  vbx->Fill(vx);
+		  vby->Fill(vy);
+		  vbz->Fill(vz);
+		  vbe->Fill(ve);
+		  vbmass->Fill(vmass);
+		  omass = mass;
+		  oldmass->Fill(mass);
+		  mesonMotherID = mid;
+		  mesonid->Fill(mid);
+		  dtr++;
+		} // <-- if energy^2 is greater than mass^2
+	    } // <-- end n loop
 	}
       if(ctr>0)
 	{
