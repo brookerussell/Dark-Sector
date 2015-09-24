@@ -7,14 +7,14 @@ void Decay::Detector()
 {
   TFile* y = new TFile("Stoneham.root");
   TTree *k = (TTree*)y->Get("k");
-  int vbosons;
-  double vx,vy,vz,ve,vmass,px,py,pz,pe,omass;
-  k->SetBranchAddress("vbosons",&vbosons);
-  k->SetBranchAddress("vx",&vx);
-  k->SetBranchAddress("vy",&vy);
-  k->SetBranchAddress("vz",&vz);
-  k->SetBranchAddress("ve",&ve);
-  k->SetBranchAddress("vmass",&vmass);
+  int nVbosons;
+  double VB_Px,VB_Py,VB_Pz,VB_E,VB_mass,px,py,pz,pe,omass;
+  k->SetBranchAddress("nVbosons",&nVbosons);
+  k->SetBranchAddress("VB_Px",&VB_Px);
+  k->SetBranchAddress("VB_Py",&VB_Py);
+  k->SetBranchAddress("VB_Pz",&VB_Pz);
+  k->SetBranchAddress("VB_E",&VB_E);
+  k->SetBranchAddress("VB_mass",&VB_mass);
   k->SetBranchAddress("px",&px);
   k->SetBranchAddress("py",&py);
   k->SetBranchAddress("pz",&pz);
@@ -83,9 +83,9 @@ void Decay::Detector()
   {
       k->GetEntry(i);
 
-      if(vx<0) {vx = vx*-1;}
-      if(vy<0) {vy = vy*-1;}
-      if(vz<0) {vz = vz*-1;}
+      if(VB_Px<0) {VB_Px = VB_Px*-1;}
+      if(VB_Py<0) {VB_Py = VB_Py*-1;}
+      if(VB_Pz<0) {VB_Pz = VB_Pz*-1;}
 
       float frontend [3] = {110.0,470.0,600.0}; 
       float backend [3] = {113.6,480.0,619.6};
@@ -100,24 +100,24 @@ void Decay::Detector()
 	{
 	  for(int j=0; j<3; j++)
 	    {
-	      if(vx/vz < xdist[j]/frontend[j])
+	      if(VB_Px/VB_Pz < xdist[j]/frontend[j])
 		{
-		  if(vy/vz < ydist[j]/frontend[j])
+		  if(VB_Py/VB_Pz < ydist[j]/frontend[j])
 		    {
-		      float Partial_width = k*alpha_EM*pow(vmass,3.0)
+		      float Partial_width = k*alpha_EM*pow(VB_mass,3.0)
 			*pow(96.0,-1.0)*pow(pi,-3.0)*pow(f_pion,-2.0)
-			*pow(1-(pow(mass_pion,2.0)*pow(vmass,-2.0)),3.0);
+			*pow(1-(pow(mass_pion,2.0)*pow(VB_mass,-2.0)),3.0);
 		      float Tau = pow(Partial_width,-1.0);
 		      TLorentzVector Ephemeral;
-		      Ephemeral.SetPxPyPzE(vx,vy,vz,ve);
+		      Ephemeral.SetPxPyPzE(VB_Px,VB_Py,VB_Pz,VB_E);
 		      float boost_mag = Ephemeral.Beta();
 		      float lbar = boost_mag*c*Tau;
 		      float P_decay = exp(-frontend[j]*pow(lbar,-1.0))
 			-exp(-backend[j]*pow(lbar,-1.0));
-		      dx = vx;
-		      dy = vy;
-		      dz = vz;
-		      de = ve;
+		      dx = VB_Px;
+		      dy = VB_Py;
+		      dz = VB_Pz;
+		      de = VB_E;
 		      pw = Partial_width;
 		      prob = P_decay;
 		      exprob = P_decay*66000000000000;
@@ -125,13 +125,13 @@ void Decay::Detector()
 		      gb = log10(k);
 		      g->Fill(log10(k));
 		      proj->Fill(exprob);
-		      if(j == 0) {sb->Fill(exprob);ssb->Fill(vmass,log10(k),exprob);}
-		      if(j == 1) {mi->Fill(exprob);smi->Fill(vmass,log10(k),exprob);}
-		      if(j == 2) {ic->Fill(exprob);sic->Fill(vmass,log10(k),exprob);}
+		      if(j == 0) {sb->Fill(exprob);ssb->Fill(VB_mass,log10(k),exprob);}
+		      if(j == 1) {mi->Fill(exprob);smi->Fill(VB_mass,log10(k),exprob);}
+		      if(j == 2) {ic->Fill(exprob);sic->Fill(VB_mass,log10(k),exprob);}
 		      
 		      // boost mediator to its rest frame
 		      TLorentzVector Temp;
-		      Temp.SetPxPyPzE(vx,vy,vx,ve);
+		      Temp.SetPxPyPzE(VB_Px,VB_Py,VB_Pz,VB_E);
 		      float mlf = Temp.Mag();
 		      medlf->Fill(std::abs(mlf));
 		      Temp.Boost(-Temp.Px()/Temp.E(),
@@ -188,8 +188,8 @@ void Decay::Detector()
 		      PiZero.Clear();
 		      Photon1.Clear();
 		      Photon2.Clear();
-		    } // <-- end vy if
-		} // <-- end vx if
+		    } // <-- end VB_Py if
+		} // <-- end VB_Px if
 	    } // <-- end j loop/end frontend loop	  
 	} // <-- end k loop
       if(ctr>0)

@@ -34,16 +34,37 @@ void VB::PseudoscalarMeson()
   TTree k("k","");
   
   // ### Useful variables for storing and creating ###
-  int vbosons,mesonMotherID;
-  double  vx,vy,vz,ve,mxlf,mylf,mzlf,melf,mxrf,myrf,mzrf,merf,v,ml,mr,vmass,omass, px,py,pz,pe,p;
-  k.Branch("vbosons",&vbosons,"vbosons/I");
+  int nVbosons,mesonMotherID;
+  // ### Variables for the Vector Boson ###
+  double  VB_Px,VB_Py,VB_Pz,VB_E,VB_mass, VB_P; 
+  
+  double mxlf,mylf,mzlf,melf,mxrf,myrf,mzrf,merf,ml,mr,omass, px,py,pz,pe,p;
+  
+  // ### Number of Vector Bosons created ###
+  k.Branch("nVbosons",&nVbosons,"nVbosons/I");
+  
+  // ### The ID number of the meson which created the Vector Boson ###
   k.Branch("mesonMotherID",&mesonMotherID,"mesonMotherID/I");
-  k.Branch("vx",&vx,"vx/D"); // lab frame vectorboson momentum
-  k.Branch("vy",&vy,"vy/D");
-  k.Branch("vz",&vz,"vz/D");
-  k.Branch("ve",&ve,"ve/D"); // lab frame vectorboson energy
-  k.Branch("v",&v,"v/D"); // lab frame vectorboson 3-momentum
-  k.Branch("vmass",&vmass,"vmass/D"); // vectorboson mass
+  
+  // ### The Px component of the Vector Boson ###
+  k.Branch("VB_Px",&VB_Px,"VB_Px/D"); // lab frame vectorboson momentum
+  
+  // ### The Py component of the Vector Boson ###
+  k.Branch("VB_Py",&VB_Py,"VB_Py/D");
+  
+  // ### The Pz component of the Vector Boson ###
+  k.Branch("VB_Pz",&VB_Pz,"VB_Pz/D");
+  
+  // ### The Energy of the Vector Boson ###
+  k.Branch("VB_E",&VB_E,"VB_E/D"); // lab frame vectorboson energy
+  
+  // ### The Vector Boson momentum P = E^2 - m^2 ###
+  k.Branch("VB_P",&VB_P,"VB_P/D"); // lab frame vectorboson 3-momentum
+  
+  // ### The Vector Boson Invariant mass ###
+  k.Branch("VB_mass",&VB_mass,"VB_mass/D"); // vectorboson mass
+  
+  
   k.Branch("mxlf",&mxlf,"mxlf/D"); // lab frame initial meson momentum 
   k.Branch("mylf",&mylf,"mylf/D");
   k.Branch("mzlf",&mzlf,"mzlf/D");
@@ -61,6 +82,10 @@ void VB::PseudoscalarMeson()
   k.Branch("p",&p,"p/D"); // lab frame 3-momentum
   k.Branch("omass",&omass,"omass/D"); // meson mass
   //z->cd();
+  
+  // ########################
+  // ### Histogram Checks ###
+  // ########################
   TH1F *mesonid = new TH1F("mesonid","Meson Mother ID",5,1,5);
   TH1F *vbx = new TH1F("vbx","P_{x} (V_{B} lab frame) ",400,-2,2);
   TH1F *vby = new TH1F("vby","P_{y} (V_{B} lab frame)",400,-2,2);
@@ -180,12 +205,12 @@ void VB::PseudoscalarMeson()
 		  float pm = PhotonInitial_lf.Mag(); //lab frame
 		  plf->Fill(pm);
 		  std::cout<<"V LF = "<<vm<<" V RF = "<<vb_rfinv<<" P LF = "<< pm <<" P RF = "<< ph_rfinv<<std::endl;
-		  vx = VectorBoson_lf.Px();
-		  vy = VectorBoson_lf.Py();
-		  vz = VectorBoson_lf.Pz();
-		  ve = VectorBoson_lf.E();
-		  v = sqrt(vx*vx+vy*vy+vz*vz);
-		  vmass = m;
+		  VB_Px = VectorBoson_lf.Px();
+		  VB_Py = VectorBoson_lf.Py();
+		  VB_Pz = VectorBoson_lf.Pz();
+		  VB_E = VectorBoson_lf.E();
+		  VB_P = sqrt(VB_Px*VB_Px+VB_Py*VB_Py+VB_Pz*VB_Pz);
+		  VB_mass = m;
 		  px = PhotonInitial_lf.Px();
 		  py = PhotonInitial_lf.Py();
 		  pz = PhotonInitial_lf.Pz();
@@ -194,15 +219,15 @@ void VB::PseudoscalarMeson()
 		  omass = mesonMass;
 		  mesonMotherID = mesonID;
 		  mesonid->Fill(mesonID);
-		  vbx->Fill(vx);
-		  vby->Fill(vy);
-		  vbz->Fill(vz);
-		  vbe->Fill(ve);
+		  vbx->Fill(VB_Px);
+		  vby->Fill(VB_Py);
+		  vbz->Fill(VB_Pz);
+		  vbe->Fill(VB_E);
 		  phx->Fill(px);
 		  phy->Fill(py);
 		  phz->Fill(pz);
 		  phe->Fill(pe);
-		  vbmass->Fill(vmass); // vectorboson mesonMass
+		  vbmass->Fill(VB_mass); // vectorboson mesonMass
 		  oldmass->Fill(mesonMass); // original mesonMass */
 		  ctr++;
 		  // Clear all 4-momenta, otherwise a sefault will result
@@ -223,18 +248,18 @@ void VB::PseudoscalarMeson()
 	      float iE = sqrt((n*n)+(mesonPnew*mesonPnew));
 	      if((iE*iE)>(n*n))
 		{
-		  v = sqrt((iE*iE)-(n*n)); // vector boson 3-momentum
-		  ve = sqrt((v*v)+(n*n)); // vector boson energy
+		  VB_P = sqrt((iE*iE)-(n*n)); // vector boson 3-momentum
+		  VB_E = sqrt((VB_P*VB_P)+(n*n)); // vector boson energy
 		  // assign vector boson component momentum (respecting ratio of original meson)
-		  vx = (v*mesonPx)/mesonPnew;
-		  vy = (v*mesonPy)/mesonPnew;
-		  vz = (v*mesonPz)/mesonPnew;
-		  vmass = n;
-		  vbx->Fill(vx);
-		  vby->Fill(vy);
-		  vbz->Fill(vz);
-		  vbe->Fill(ve);
-		  vbmass->Fill(vmass);
+		  VB_Px = (VB_P*mesonPx)/mesonPnew;
+		  VB_Py = (VB_P*mesonPy)/mesonPnew;
+		  VB_Pz = (VB_P*mesonPz)/mesonPnew;
+		  VB_mass = n;
+		  vbx->Fill(VB_Px);
+		  vby->Fill(VB_Py);
+		  vbz->Fill(VB_Pz);
+		  vbe->Fill(VB_E);
+		  vbmass->Fill(VB_mass);
 		  omass = mesonMass;
 		  oldmass->Fill(mesonMass);
 		  mesonMotherID = mesonID;
@@ -245,7 +270,7 @@ void VB::PseudoscalarMeson()
 	}
       if(ctr>0)
 	{
-	  vbosons = ctr+dtr;
+	  nVbosons = ctr+dtr;
 	  k.Fill();
 	}
     } // <-- end i loop
