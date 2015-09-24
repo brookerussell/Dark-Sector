@@ -164,8 +164,8 @@ void VB::PseudoscalarMeson()
   // ###############################
   // ### Looping over all events ###
   // ###############################
-  for(Int_t i=0; i<mentries; i++)
-  //for(Int_t i=0; i<100; i++)
+  //for(Int_t i=0; i<mentries; i++)
+  for(Int_t i=0; i<10000; i++)
      {
      // ### Printing Events ###
      if(i % 10000 == 0){std::cout<<"Event = "<<i<<std::endl;} 
@@ -302,8 +302,11 @@ void VB::PseudoscalarMeson()
 	       
 	       
 	       // ### Defining the boost frame back to the lab frame ###
-	       labFrameVB = VB_lf + meson_lf;
-	       labFramePho = Pho_lf + meson_lf;
+	       //labFrameVB = VB_lf + meson_lf;
+	       //labFramePho = Pho_lf + meson_lf;
+	       
+	       labFrameVB = meson_lf;
+	       labFramePho = meson_lf;
 	       
 	       // ### Boosting the VB to the lab frame ###	     
 	       VB_lf.Boost(labFrameVB.BoostVector());
@@ -331,6 +334,18 @@ void VB::PseudoscalarMeson()
 	       omass = mesonMass;
 	       mesonMotherID = mesonID;
 	       
+	       mesonid->Fill(mesonID);
+		  vbx->Fill(VB_Px);
+		  vby->Fill(VB_Py);
+		  vbz->Fill(VB_Pz);
+		  vbe->Fill(VB_E);
+		  phx->Fill(photon_Px);
+		  phy->Fill(photon_Py);
+		  phz->Fill(photon_Pz);
+		  phe->Fill(photon_E);
+		  vbmass->Fill(VB_mass); // vectorboson mesonMass
+	       
+	       k.Fill();
 	       //std::cout<<"In Lab frame Inv Mass = "<<invMassAfter<<std::endl;
 	       //std::cout<<std::endl;
 	         
@@ -356,16 +371,7 @@ void VB::PseudoscalarMeson()
 		  plf->Fill(pm);
 		  std::cout<<"V LF = "<<vm<<" V RF = "<<vb_rfinv<<" P LF = "<< pm <<" P RF = "<< ph_rfinv<<std::endl;
 		  
-		  mesonid->Fill(mesonID);
-		  vbx->Fill(VB_Px);
-		  vby->Fill(VB_Py);
-		  vbz->Fill(VB_Pz);
-		  vbe->Fill(VB_E);
-		  phx->Fill(photon_Px);
-		  phy->Fill(photon_Py);
-		  phz->Fill(photon_Pz);
-		  phe->Fill(photon_E);
-		  vbmass->Fill(VB_mass); // vectorboson mesonMass
+		  
 		  oldmass->Fill(mesonMass); // original mesonMass */
 		  ctr++;
 		  // Clear all 4-momenta, otherwise a sefault will result
@@ -392,24 +398,28 @@ void VB::PseudoscalarMeson()
 		  VB_Px = (VB_P*mesonPx)/mesonPnew;
 		  VB_Py = (VB_P*mesonPy)/mesonPnew;
 		  VB_Pz = (VB_P*mesonPz)/mesonPnew;
-		  VB_mass = n;
+		  
+		  float invMass = sqrt ( (VB_E*VB_E) - ( (VB_Px*VB_Px) + (VB_Py*VB_Py) + (VB_Pz*VB_Pz) ) );
+		  VB_mass = invMass;
 		  vbx->Fill(VB_Px);
 		  vby->Fill(VB_Py);
 		  vbz->Fill(VB_Pz);
 		  vbe->Fill(VB_E);
-		  vbmass->Fill(VB_mass);
+		  vbmass->Fill(invMass);
 		  omass = mesonMass;
 		  oldmass->Fill(mesonMass);
 		  mesonMotherID = mesonID;
 		  mesonid->Fill(mesonID);
 		  dtr++;
+		  
+		  k.Fill();
 		} // <-- if energy^2 is greater than mesonMass^2
 	    } // <-- end n loop
 	}
       if(ctr>0)
 	{
 	  nVbosons = ctr+dtr;
-	  k.Fill();
+	  
 	}
     } // <-- end i loop
   z->Close();

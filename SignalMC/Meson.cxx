@@ -133,6 +133,7 @@ void Meson::SetParams()
 	// ###     Eta = 0.547 GeV, Omega = 0.775 GeV, Rho = 0.783 GeV, Eta-prime = 0.958 GeV, Phi = 1.02 GeV   ###
 	float fakeMass[5] = {0.54785,0.77526,0.78265,0.95778,1.019461};
 	
+	ctr = 0;
 	// ### Looping over all the "fake" particles we are trying to create
 	for(const auto& fM : fakeMass)
 	  {
@@ -233,6 +234,8 @@ void Meson::SetParams()
 		
 		// ### Filling the TTree ###
 		mesonMass = fM;
+		
+		float awesome = mesonMass;
 		mesonID = id;
 		
 		// ### Defining temp invariant mass ###
@@ -250,7 +253,8 @@ void Meson::SetParams()
 		y->Fill(fakePy);
 		z->Fill(fakePz);
 		e->Fill(fakeE);
-		m->Fill(fM);
+		//m->Fill(fM);
+		m->Fill(awesome);
 		n->Fill(pi0Momentum,fakePnew);
 		d->Fill(id);
 		ie->Fill(id,fakeE);
@@ -264,18 +268,18 @@ void Meson::SetParams()
 		
 		// ### Iterate a counter if we made a new meson ###
 		ctr++;
-		
+		l.Fill(); // fill the tre
 		} // <-- end if
 	  } // <-- end fakeMass loop 
+	
+	//nMesons = ctr; // total number of mesons populated in tree
+         
+	
 	} // <-- end j loop
-      //} // end i loop
   
-  // ### If we made a new meson go into this loop ###
-  if(ctr>0)
-      {
-	nMesons = ctr; // total number of mesons populated in tree
-        l.Fill(); // fill the tree
-      }
+     //nMesons = ctr; // total number of mesons populated in tree
+     //l.Fill(); // fill the tree
+     
     } // <-- end i loop 
   f->Close(); 
   fout->Write(); 
