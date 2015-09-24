@@ -38,7 +38,10 @@ void VB::PseudoscalarMeson()
   // ### Variables for the Vector Boson ###
   double  VB_Px,VB_Py,VB_Pz,VB_E,VB_mass, VB_P; 
   
-  double mxlf,mylf,mzlf,melf,mxrf,myrf,mzrf,merf,ml,mr,omass, px,py,pz,pe,p;
+  // ### Variables for tracking the parent meson ###
+  double mesonPx_LF,mesonPy_LF,mesonPz_LF,mesonE_LF, mesonP_LF;
+  double mesonPx_CMF,mesonPy_CMF,mesonPz_CMF,mesonE_CMF,mesonP_CMF;
+  double omass, photon_Px,photon_Py,photon_Pz,photon_E,photon_P;
   
   // ### Number of Vector Bosons created ###
   k.Branch("nVbosons",&nVbosons,"nVbosons/I");
@@ -64,22 +67,52 @@ void VB::PseudoscalarMeson()
   // ### The Vector Boson Invariant mass ###
   k.Branch("VB_mass",&VB_mass,"VB_mass/D"); // vectorboson mass
   
+  // ### Meson Px (GeV) in the lab frame###
+  k.Branch("mesonPx_LF",&mesonPx_LF,"mesonPx_LF/D"); // lab frame initial meson momentum 
   
-  k.Branch("mxlf",&mxlf,"mxlf/D"); // lab frame initial meson momentum 
-  k.Branch("mylf",&mylf,"mylf/D");
-  k.Branch("mzlf",&mzlf,"mzlf/D");
-  k.Branch("melf",&melf,"melf/D"); // lab frame initial meson energy
-  k.Branch("mxrf",&mxrf,"mxrf/D"); // rest frame initial meson momentum 
-  k.Branch("myrf",&myrf,"myrf/D");
-  k.Branch("mzrf",&mzrf,"mzrf/D");
-  k.Branch("merf",&merf,"merf/D"); // rest frame initial meson energy
-  k.Branch("ml",&ml,"ml/D"); // lab frame meson 3-momentum
-  k.Branch("mr",&mr,"mr/D"); // rest frame meson 3-momentum
-  k.Branch("px",&px,"px/D"); // lab frame photon momentum
-  k.Branch("py",&py,"py/D");
-  k.Branch("pz",&pz,"pz/D");
-  k.Branch("pe",&pe,"pe/D"); // lab frame photon energy
-  k.Branch("p",&p,"p/D"); // lab frame 3-momentum
+  // ### Meson Py (GeV) in the lab frame ###
+  k.Branch("mesonPy_LF",&mesonPy_LF,"mesonPy_LF/D");
+  
+  // ### Meson Pz (GeV) in the lab frame ###
+  k.Branch("mesonPz_LF",&mesonPz_LF,"mesonPz_LF/D");
+  
+  // ### Meson Energy in the lab frame (GeV) ###
+  k.Branch("mesonE_LF",&mesonE_LF,"mesonE_LF/D"); // lab frame initial meson energy
+  
+  // ### Meson 3-momentum in the lab frame (GeV) sqrt(Px^2 + Py^2 + P^2) ###
+  k.Branch("mesonP_LF",&mesonP_LF,"mesonP_LF/D"); // lab frame meson 3-momentum
+  
+  // ### Meson Px (GeV) in the Center-of_Mass frame###
+  k.Branch("mesonPx_CMF",&mesonPx_CMF,"mesonPx_CMF/D"); // rest frame initial meson momentum 
+  
+  // ### Meson Py (GeV) in the Center-of_Mass frame###
+  k.Branch("mesonPy_CMF",&mesonPy_CMF,"mesonPy_CMF/D");
+  
+  // ### Meson Pz (GeV) in the Center-of_Mass frame###
+  k.Branch("mesonPz_CMF",&mesonPz_CMF,"mesonPz_CMF/D");
+  
+  // ### Meson E (GeV) in the Center-of_Mass frame###
+  k.Branch("mesonE_CMF",&mesonE_CMF,"mesonE_CMF/D"); // rest frame initial meson energy
+  
+  // ### Meson 3-momentum (GeV) in the Center-of_Mass frame###
+  k.Branch("mesonP_CMF",&mesonP_CMF,"mesonP_CMF/D"); // rest frame meson 3-momentum
+  
+  // ### Photon Px (GeV) ###
+  k.Branch("photon_Px",&photon_Px,"photon_Px/D"); // lab frame photon momentum
+  
+  // ### Photon Py (GeV) ###
+  k.Branch("photon_Py",&photon_Py,"photon_Py/D");
+  
+  // ### Photon Pz (GeV) ###
+  k.Branch("photon_Pz",&photon_Pz,"photon_Pz/D");
+  
+  // ### Photon E (GeV) ###
+  k.Branch("photon_E",&photon_E,"photon_E/D"); // lab frame photon energy
+  
+  // ### Photon 3-momentum (GeV) ###
+  k.Branch("photon_P",&photon_P,"photon_P/D"); // lab frame 3-momentum
+  
+  
   k.Branch("omass",&omass,"omass/D"); // meson mass
   //z->cd();
   
@@ -111,130 +144,235 @@ void VB::PseudoscalarMeson()
   TH1F *rpy = new TH1F("rpy","P_{Y} (#gamma rest frame)",400,-2,2);
   TH1F *rpz = new TH1F("rpz","P_{Z} (#gamma rest frame)",400,-2,2);
   TH1F *rpe = new TH1F("rpe", "#gamma Energy (rest frame)",400,-2,2);
+  
+  
+  // ### Counters for number of mesons with mass ###
+  // ###   greater than the vector boson mass    ###
   int ctr = 0;
+  
+  // ### Counters for number of mesons with mass ###
+  // ###   greater than the vector boson mass    ###
   int dtr = 0;
+  
+  // ### Defining TLorentzVector for boosts ###
   TLorentzVector com, zero_m, com_a, zero_a, com_b, zero_b;
+  
+  TLorentzVector labFrameVB, labFramePho;
+  // ### Grabbing the number of events (POT) ###
   Int_t mentries = (Int_t)l->GetEntries();
+  
+  // ###############################
+  // ### Looping over all events ###
+  // ###############################
   for(Int_t i=0; i<mentries; i++)
+  //for(Int_t i=0; i<100; i++)
      {
      // ### Printing Events ###
      if(i % 10000 == 0){std::cout<<"Event = "<<i<<std::endl;} 
      
+     // ### Getting current entry for this event ###
      l->GetEntry(i);
-     mxlf = mesonPx; // meson lab frame momentum components 
-     mylf = mesonPy;
-     mzlf = mesonPz;
-     melf = mesonE; // meson energy lab frame
-     ml = sqrt(mesonPx*mesonPx+mesonPy*mesonPy+mesonPz*mesonPz); // meson lab frame 3-momentum
+     
+     // ### Grabbing the mesons (to create a Vector Boson) ###
+     mesonPx_LF = mesonPx; // meson lab frame momentum components 
+     mesonPy_LF = mesonPy;
+     mesonPz_LF = mesonPz;
+     mesonE_LF = mesonE; // meson energy lab frame
+     
+     // ### P = sqrt(Px^2 + Py^2 + Pz^2) ###
+     mesonP_LF = sqrt( (mesonPx*mesonPx) + (mesonPy*mesonPy) + (mesonPz*mesonPz) ); // meson lab frame 3-momentum
+     
+     // ###########################################
+     // ### Defining the lab frame of the meson ###
+     // ###########################################
      TLorentzVector meson_lf;
      meson_lf.SetPxPyPzE(mesonPx,mesonPy,mesonPz,mesonE);
+     
+     // ### Saving the invariant mass in the lab frame ###
      float mlfinv = meson_lf.Mag();
      mlf->Fill(mlfinv);
+     
+     // ### Defining a zero rest frame ###
      zero_m.SetPxPyPzE(0,0,0,0);
+     
+     // ### Defining the center of mass frame as the lab frame + zero frame ###
      com = meson_lf + zero_m;
-     // boost meson to its rest frame
+     
+     // ### Boost meson to its rest frame ###
      meson_lf.Boost(-com.BoostVector());
-     TLorentzVector meson_rf;
-     meson_rf.SetPxPyPzE(meson_lf[0],
+     
+     // ### Defining the meson center-of-mass frame ###
+     TLorentzVector meson_cmf;
+     
+     // ### Setting the Center-of-Mass variables ###
+     meson_cmf.SetPxPyPzE(meson_lf[0],
          		  meson_lf[1],
 			  meson_lf[2],
 			  meson_lf[3]);
-     mxrf = meson_rf[0];
-     myrf = meson_rf[1];
-     mzrf = meson_rf[2];
-     merf = meson_rf[3];
-     mr = sqrt(meson_lf[0]*meson_lf[0]
-		+meson_lf[1]*meson_lf[1]
-		+meson_lf[2]*meson_lf[2]); //
-     float mrfinv = meson_rf.Mag(); // meson rest frame invariant mesonMass
+     
+     // ### Storing to the TTree the CMF variables for the meson ###
+     mesonPx_CMF = meson_cmf[0];
+     mesonPy_CMF = meson_cmf[1];
+     mesonPz_CMF = meson_cmf[2];
+     mesonE_CMF = meson_cmf[3];
+     mesonP_CMF = sqrt( (meson_lf[0]*meson_lf[0])
+		      + (meson_lf[1]*meson_lf[1])
+		      + (meson_lf[2]*meson_lf[2]) );
+     
+     // ### Storing the invariant mass in the center of mass frame ###		      
+     float mrfinv = meson_cmf.Mag(); // meson rest frame invariant mesonMass
      mrf->Fill(mrfinv); 
+     
+     // ##############################################################
+     // ### If the meson is a Eta (ID == 1) or Eta-prime (ID == 4) ###
+     // ###                     Decay in Flight                    ###
+     // ##############################################################
      if (mesonID == 1 || mesonID == 4)
 	{
-	  TLorentzVector meson_rf;
-	  meson_rf.SetPxPyPzE(mxrf,myrf,mzrf,merf);
-	  TGenPhaseSpace event_k;
-	  for(float m = 0.140; m<0.630; m+=0.010) // vector boson masses
+	 
+	 // ### Defining the meson center-of-mass frame ###
+	 TLorentzVector meson_cmf;
+	 // ### Setting the Center-of-Mass variables ###
+	 meson_cmf.SetPxPyPzE(mesonPx_CMF,mesonPy_CMF,mesonPz_CMF,mesonE_CMF);
+	 // ??????
+	 TGenPhaseSpace event_k;
+	 
+	 // ### Looping over mass ranges in 10 MeV steps ###
+	 for(float m = 0.140; m<0.630; m+=0.010) // vector boson masses
 	    {
-	      double masses[2] = {m,0.0};
-	      if(mesonMass > m)
-		{
-		  event_k.SetDecay(meson_rf,2,masses);
-		  event_k.Generate();
-		  TLorentzVector *vectorBoson = event_k.GetDecay(0);
-		  TLorentzVector *photonInitial = event_k.GetDecay(1);
-		  TLorentzVector VectorBoson_rf = *vectorBoson;
-		  TLorentzVector PhotonInitial_rf = *photonInitial;
-		  float vb_rfinv = VectorBoson_rf.Mag(); //rest frame
-		  vobrf->Fill(vb_rfinv);
-		  float ph_rfinv = PhotonInitial_rf.Mag(); //rest frame
-		  prf->Fill(ph_rfinv);
-		  float restvbx = VectorBoson_rf.Px();
-		  float restvby = VectorBoson_rf.Py();
-		  float restvbz = VectorBoson_rf.Pz();
-		  float restvbe = VectorBoson_rf.E();
-		  rvbx->Fill(restvbx);
-		  rvby->Fill(restvby);
-		  rvbz->Fill(restvbz);
-		  rvbe->Fill(restvbe);
-		  float restpx = PhotonInitial_rf.Px();
-		  float restpy = PhotonInitial_rf.Py();
-		  float restpz = PhotonInitial_rf.Pz();
-		  float restpe = PhotonInitial_rf.E();
-		  rpx->Fill(restpx);
-		  rpy->Fill(restpy);
-		  rpz->Fill(restpz);
-		  rpe->Fill(restpe);
-		  /*zero_a.SetPxPyPzE(0,0,0,0);
-		  com_a = VectorBoson_rf + zero_a;
-		  VectorBoson_rf.Boost(-com_a.BoostVector());
-		  //zero_b.SetPxPyPzE(0,0,0,0);
-		  //com_b = PhotonInitial_rf + zero_b;
-		  PhotonInitial_rf.Boost(-com_a.BoostVector());
-		  TLorentzVector VectorBoson_lf;
-		  VectorBoson_lf.SetPxPyPzE(VectorBoson_rf[0],
-		  		    VectorBoson_rf[1],
-		  		    VectorBoson_rf[2],
-		  		    VectorBoson_rf[3]);
-		  TLorentzVector PhotonInitial_lf;
-		  PhotonInitial_lf.SetPxPyPzE(PhotonInitial_rf[0],
-		  		    PhotonInitial_rf[1],
-		  		    PhotonInitial_rf[2],
-		  		    PhotonInitial_rf[3]);
+	    
+	    // ### Setting a vector of mass ###
+	    double masses[2] = {m,0.0};
+	    
+	    // ### If the mass of the meson is greater than the mass of the ###
+	    // ###    vector boson we can allow the Vector Boson decay      ###
+	    if(mesonMass > m)
+	       {
+	       
+	       // ### Set the decay of the meson ###
+	       event_k.SetDecay(meson_cmf,2,masses);
+	       
+	       // ### Actually decay the particle ###
+	       event_k.Generate();
+	       
+	       // ### Create a TLorentzVector for the Vector Boson ###
+	       TLorentzVector *vectorBoson = event_k.GetDecay(0);
+	       // ### Create a TLorentzVector for the Photon ###
+	       TLorentzVector *photonInitial = event_k.GetDecay(1);
+	       
+	       // ### Creating TLorentzVectors to Vector Bosons in the COM ###
+	       TLorentzVector VectorBoson_CM = *vectorBoson;
+	       // ### Creating TLorentzVectors to Vector Bosons in the COM ###
+	       TLorentzVector PhotonInitial_CM = *photonInitial;
+	       
+	       // ### Calculating the Vector Boson COM Invariant Mass ###
+	       float vb_rfinv = VectorBoson_CM.Mag(); //rest frame
+	       vobrf->Fill(vb_rfinv);
+	       
+	       // ### Calculating the Photon COM Invariant Mass ###
+	       float ph_rfinv = PhotonInitial_CM.Mag(); //rest frame
+	       prf->Fill(ph_rfinv);
+		  
+	       float restvbx = VectorBoson_CM.Px();
+	       float restvby = VectorBoson_CM.Py();
+	       float restvbz = VectorBoson_CM.Pz();
+	       float restvbe = VectorBoson_CM.E();
+	       rvbx->Fill(restvbx);
+	       rvby->Fill(restvby);
+	       rvbz->Fill(restvbz);
+	       rvbe->Fill(restvbe);
+		  
+	       float restpx = PhotonInitial_CM.Px();
+	       float restpy = PhotonInitial_CM.Py();
+	       float restpz = PhotonInitial_CM.Pz();
+	       float restpe = PhotonInitial_CM.E();
+	       rpx->Fill(restpx);
+      	       rpy->Fill(restpy);
+	       rpz->Fill(restpz);
+	       rpe->Fill(restpe);
+	       
+	       
+	       // ### Now boost the Vector Boson back to the lab frame ###
+	       TLorentzVector VB_lf;
+	       VB_lf.SetPxPyPzE(restvbx, restvby, restvbz, restvbe);
+	       
+	       // ### Now boost the photon back to the lab frame ###
+	       TLorentzVector Pho_lf;
+	       Pho_lf.SetPxPyPzE(restpx, restpy, restpz, restpe);
+	       
+	       
+	       // ### Defining the boost frame back to the lab frame ###
+	       labFrameVB = VB_lf + meson_lf;
+	       labFramePho = Pho_lf + meson_lf;
+	       
+	       // ### Boosting the VB to the lab frame ###	     
+	       VB_lf.Boost(labFrameVB.BoostVector());
+	       
+	       // ### Boosting the Photon to the lab frame ###
+	       Pho_lf.Boost(labFramePho.BoostVector());
+	    
+	       float invMassAfter = sqrt( (VB_lf[3]*VB_lf[3]) - 
+	                             ( (VB_lf[0]*VB_lf[0]) + (VB_lf[1]*VB_lf[1]) + (VB_lf[2]*VB_lf[2]) ));
+				     
+	       // ### Saving the Vector Bosons to the tree ###			     
+	       VB_Px = VB_lf[0];
+	       VB_Py = VB_lf[1];
+	       VB_Pz = VB_lf[2];
+	       VB_E = VB_lf[3];
+	       VB_P = sqrt( (VB_Px*VB_Px) + (VB_Py*VB_Py) + (VB_Pz*VB_Pz) );
+	       VB_mass = invMassAfter;
+	       
+	       // ### Saving the photons to the tree ###
+	       photon_Px = Pho_lf[0];
+	       photon_Py = Pho_lf[1];
+	       photon_Pz = Pho_lf[2];
+	       photon_E = Pho_lf[3];
+	       photon_P = sqrt( (photon_Px*photon_Px) + (photon_Py*photon_Py) + (photon_Pz*photon_Pz) );
+	       omass = mesonMass;
+	       mesonMotherID = mesonID;
+	       
+	       //std::cout<<"In Lab frame Inv Mass = "<<invMassAfter<<std::endl;
+	       //std::cout<<std::endl;
+	         
+	       /*zero_a.SetPxPyPzE(0,0,0,0);
+	       com_a = VectorBoson_CM + zero_a;
+	       VectorBoson_CM.Boost(-com_a.BoostVector());
+	       //zero_b.SetPxPyPzE(0,0,0,0);
+	       //com_b = PhotonInitial_CM + zero_b;
+	       PhotonInitial_CM.Boost(-com_a.BoostVector());
+	       TLorentzVector VectorBoson_lf;
+	       VectorBoson_lf.SetPxPyPzE(VectorBoson_CM[0],
+		  		    VectorBoson_CM[1],
+		  		    VectorBoson_CM[2],
+		  		    VectorBoson_CM[3]);
+	       TLorentzVector PhotonInitial_lf;
+	       PhotonInitial_lf.SetPxPyPzE(PhotonInitial_CM[0],
+		  		    PhotonInitial_CM[1],
+		  		    PhotonInitial_CM[2],
+		  		    PhotonInitial_CM[3]);
 		  float vm = VectorBoson_lf.Mag(); // lab frame
 		  voblf->Fill(vm);
 		  float pm = PhotonInitial_lf.Mag(); //lab frame
 		  plf->Fill(pm);
 		  std::cout<<"V LF = "<<vm<<" V RF = "<<vb_rfinv<<" P LF = "<< pm <<" P RF = "<< ph_rfinv<<std::endl;
-		  VB_Px = VectorBoson_lf.Px();
-		  VB_Py = VectorBoson_lf.Py();
-		  VB_Pz = VectorBoson_lf.Pz();
-		  VB_E = VectorBoson_lf.E();
-		  VB_P = sqrt(VB_Px*VB_Px+VB_Py*VB_Py+VB_Pz*VB_Pz);
-		  VB_mass = m;
-		  px = PhotonInitial_lf.Px();
-		  py = PhotonInitial_lf.Py();
-		  pz = PhotonInitial_lf.Pz();
-		  pe = PhotonInitial_lf.E();
-		  p = sqrt(px*pz+py*py+pz*pz);
-		  omass = mesonMass;
-		  mesonMotherID = mesonID;
+		  
 		  mesonid->Fill(mesonID);
 		  vbx->Fill(VB_Px);
 		  vby->Fill(VB_Py);
 		  vbz->Fill(VB_Pz);
 		  vbe->Fill(VB_E);
-		  phx->Fill(px);
-		  phy->Fill(py);
-		  phz->Fill(pz);
-		  phe->Fill(pe);
+		  phx->Fill(photon_Px);
+		  phy->Fill(photon_Py);
+		  phz->Fill(photon_Pz);
+		  phe->Fill(photon_E);
 		  vbmass->Fill(VB_mass); // vectorboson mesonMass
 		  oldmass->Fill(mesonMass); // original mesonMass */
 		  ctr++;
 		  // Clear all 4-momenta, otherwise a sefault will result
 		  meson_lf.Clear();
-		  //meson_rf.Clear();
-		  VectorBoson_rf.Clear();
-		  PhotonInitial_rf.Clear();
+		  //meson_cmf.Clear();
+		  VectorBoson_CM.Clear();
+		  PhotonInitial_CM.Clear();
 		  //VectorBoson_lf.Clear();
 		  //PhotonInitial_lf.Clear();
 		} // <-- end if

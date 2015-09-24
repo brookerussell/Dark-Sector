@@ -8,17 +8,17 @@ void Decay::Detector()
   TFile* y = new TFile("Stoneham.root");
   TTree *k = (TTree*)y->Get("k");
   int nVbosons;
-  double VB_Px,VB_Py,VB_Pz,VB_E,VB_mass,px,py,pz,pe,omass;
+  double VB_Px,VB_Py,VB_Pz,VB_E,VB_mass,photon_Px,photon_Py,photon_Pz,photon_E,omass;
   k->SetBranchAddress("nVbosons",&nVbosons);
   k->SetBranchAddress("VB_Px",&VB_Px);
   k->SetBranchAddress("VB_Py",&VB_Py);
   k->SetBranchAddress("VB_Pz",&VB_Pz);
   k->SetBranchAddress("VB_E",&VB_E);
   k->SetBranchAddress("VB_mass",&VB_mass);
-  k->SetBranchAddress("px",&px);
-  k->SetBranchAddress("py",&py);
-  k->SetBranchAddress("pz",&pz);
-  k->SetBranchAddress("pe",&pe);
+  k->SetBranchAddress("photon_Px",&photon_Px);
+  k->SetBranchAddress("photon_Py",&photon_Py);
+  k->SetBranchAddress("photon_Pz",&photon_Pz);
+  k->SetBranchAddress("photon_E",&photon_E);
   k->SetBranchAddress("omass",&omass);
 
   TFile* fout = TFile::Open("Melrose.root","RECREATE");
