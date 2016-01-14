@@ -1,0 +1,25 @@
+import sys
+from ROOT import *
+
+a = TChain("np","")
+a.AddFile("PiNtuple.root")
+
+b = NeutralMesonProduction()
+b.NMP()
+
+c = TChain("nmp","")
+c.AddFile("NeutralMesonProduction_output.root")
+
+d = MediatorProduction()
+d.MP()
+
+e = TChain("mp","")
+e.AddFile("MediatorProduction_output.root")
+
+f = MediatorSelection()
+f.MS()
+
+#z = SanityPlots()
+#z.Check()
+
+sys.exit(0)

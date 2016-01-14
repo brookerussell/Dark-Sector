@@ -20,7 +20,7 @@ endif
 #
 # Define directories to be compile upon a global "make"...
 #
-SUBDIRS := SignalMC #ADD_NEW_SUBDIR ... do not remove this comment from this line
+SUBDIRS := MediatorVisibleDecay #ADD_NEW_SUBDIR ... do not remove this comment from this line
 
 #####################################################################################
 #

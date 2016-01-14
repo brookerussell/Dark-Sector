@@ -1,0 +1,47 @@
+/**
+ * \file NeutralMesonProduction.h
+ *
+ * \ingroup MediatorVisibleDecay
+ * 
+ * \brief Class def header for a class NeutralMesonProduction
+ *
+ * @author br
+ */
+
+/** \addtogroup MediatorVisibleDecay
+
+    @{*/
+#ifndef NEUTRALMESONPRODUCTION_H
+#define NEUTRALMESONPRODUCTION_H
+
+#include <iostream>
+#include <math.h>
+#include <TFile.h>
+#include <TTree.h>
+#include <TNtuple.h>
+#include <TH1F.h>
+#include <TH2F.h>
+#include <TLorentzVector>
+
+/**
+   \class NeutralMesonProduction
+   User defined class NeutralMesonProduction
+   doxygen documentation!
+ */
+class NeutralMesonProduction{
+
+public:
+
+  /// Default constructor
+  NeutralMesonProduction(){}
+
+  /// Default destructor
+  ~NeutralMesonProduction(){}
+
+  void NMP();
+
+};
+
+#endif
+/** @} */ // end of doxygen group 
+
