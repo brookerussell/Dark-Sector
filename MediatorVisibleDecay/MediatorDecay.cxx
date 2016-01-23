@@ -8,12 +8,14 @@ void MediatorDecay::MD()
   TFile* f = new TFile("MediatorDetectorIntercept_output.root");
   TTree *mdi = (TTree*)f->Get("mdi");
 
-  int nvb,mesonMomID,pi0ID;
+  int event_num,unique_vb,meson2vb,pi02vb,mesonMom_id,detector_id;
   double vb_px,vb_py,vb_pz,vb_e,vb_mass;
-
-  mdi->SetBranchAddress("nvb",&nvb);
-  mdi->SetBranchAddress("mesonMomID",&mesonMomID);
-  mdi->SetBranchAddress("pi0ID",&pi0ID);
+  mdi->SetBranchAddress("event_num",&event_num);
+  mdi->SetBranchAddress("unique_vb",&unique_vb);
+  mdi->SetBranchAddress("meson2vb",&meson2vb);
+  mdi->SetBranchAddress("pi02vb",&pi02vb);
+  mdi->SetBranchAddress("mesonMom_id",&mesonMom_id);
+  mdi->SetBranchAddress("detector_id",&detector_id);
   mdi->SetBranchAddress("vb_px",&vb_px);
   mdi->SetBranchAddress("vb_py",&vb_py);
   mdi->SetBranchAddress("vb_pz",&vb_pz);
@@ -50,6 +52,8 @@ void MediatorDecay::MD()
   md.Branch("ph3_e",&ph3_e,"ph3_e/F");
   md.Branch("ph3",&ph3);
 
+  TH1F *mProbDecay = new TH1F("mProbDecay","Decay Probability at MicroBooNE",100,0,1);
+
   Int_t entries = (Int_t)mdi->GetEntries();
 
   TLorentzVector Temp;
@@ -62,7 +66,23 @@ void MediatorDecay::MD()
       mdi->GetEntry(i);
 
       Temp.SetPxPyPzE(vb_px,vb_py,vb_pz,vb_e);
-        
+
+      // -----------------------------------------------------
+      //   C o m p u t e   D e c a y   P r o b a b i l i t y 
+      // -----------------------------------------------------
+      for(float k=0.000000001; k<1; k*=10) // Loop over coupling strength
+	{ 
+	  for(int j=0; j<3; j++) // Loop over detector id
+	    {    
+	      double Partial_width = k*alpha_EM*pow(vb_mass,3.0)*pow(96.0,-1.0)*pow(pi,-3.0)*pow(f_pion,-2.0)*pow(1-(pow(mass_pion,2.0)*pow(vb_mass,-2.0)),3.0);
+	      double Tau = pow(Partial_width,-1.0);
+	      double boost_mag = Temp.Beta();                             
+	      double lbar = boost_mag*c*Tau;                                   
+	      double P_decay = exp(-frontend[j]*pow(lbar,-1.0))-exp(-backend[j]*pow(lbar,-1.0));                                                    
+	      mProbDecay->Fill(P_decay);
+	    } // <-- end j loop
+	} // <-- end k loop
+      // -----------------------------------------------------                              
       TGenPhaseSpace event_d;
       double masses_d[2] = {0.139,0.0};
       event_d.SetDecay(Temp,2,masses_d);
@@ -101,7 +121,6 @@ void MediatorDecay::MD()
 
       md.Fill();
         
-      Ephemeral.Clear();
       Temp.Clear();
       pi0.Clear();
       ph1.Clear();

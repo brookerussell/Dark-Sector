@@ -42,25 +42,17 @@ public:
 
   void MD();
 
-  /*  double ProbabilityDecay(double mass, double px, double px, double pz, double e)
-  {
-    double Partial_width = k*alpha_EM*pow(VB_mass,3.0)
-      *pow(96.0,-1.0)*pow(pi,-3.0)*pow(f_pion,-2.0)
-      *pow(1-(pow(mass_pion,2.0)*pow(VB_mass,-2.0)),3.0);
+  /// SBN detectors geometry variables                                       
+  float frontend [3] = {110.0,470.0,600.0}; // front end distance of each TPC  
+  float backend [3] = {133.6,480.0,619.6}; // back end distance of each TPC 
+  float xdist [3] = {2.0,1.25,3.6}; // x-direction width from beam center 
+  float ydist[3] = {2.0,1.25,3.9}; // y-direction width from beam center
 
-    double Tau = pow(Partial_width,-1.0);
-          
-    Ephemeral.SetPxPyPzE(VB_Px,VB_Py,VB_Pz,VB_E);
-          
-    double boost_mag = Ephemeral.Beta();
-
-    double lbar = boost_mag*c*Tau;
-
-    double P_decay = exp(-frontend[j]*pow(lbar,-1.0))
-      -exp(-backend[j]*pow(lbar,-1.0));
-  }
-  */
-  TLorentzVector Ephemeral;
+  float c = 299792458; // speed of light
+  float alpha_EM = 7.29735257*pow(10.0,-3.0); // fine structure constant
+  float pi = 3.141592653589;
+  float f_pion = 0.093;
+  float mass_pion = 0.1349766; // Pi0 mass in GeV
 
 };
 

@@ -8,30 +8,33 @@ void MediatorDetectorIntercept::MDI()
   TFile* f = new TFile("MediatorSelection_output.root");
   TTree *ms = (TTree*)f->Get("ms");
 
-  int nVB,mesonMother_id,Pi0_id;
-  double VB_PX,VB_PY,VB_PZ,VB_ENERGY,VB_MOM,VB_MASS;
+  int eventNUM,UniqueVB,MesonToVB,Pi0ToVB,mesonMother_id;
+  double VB_PX,VB_PY,VB_PZ,VB_ENERGY,VB_MASS;
 
-  ms->SetBranchAddress("nVB",&nVB);
+  ms->SetBranchAddress("eventNUM",&eventNUM); // Event number
+  ms->SetBranchAddress("UniqueVB",&UniqueVB); // # to track VB
+  ms->SetBranchAddress("MesonToVB",&MesonToVB); // Links meson to VB
+  ms->SetBranchAddress("Pi0ToVB",&Pi0ToVB); // Links Pi0 to VB
   ms->SetBranchAddress("mesonMother_id",&mesonMother_id);
-  ms->SetBranchAddress("Pi0_id",&Pi0_id);
   ms->SetBranchAddress("VB_PX",&VB_PX);
   ms->SetBranchAddress("VB_PY",&VB_PY);
   ms->SetBranchAddress("VB_PZ",&VB_PZ);
   ms->SetBranchAddress("VB_ENERGY",&VB_ENERGY);
-  ms->SetBranchAddress("VB_MOM",&VB_MOM);
   ms->SetBranchAddress("VB_MASS",&VB_MASS);
 
   TFile* fout = TFile::Open("MediatorDetectorIntercept_output.root","RECREATE")\
     ;
   TTree mdi("mdi","");
 
-  int nvb,mesonMomID,pi0ID;
+  int event_num,unique_vb,meson2vb,pi02vb,mesonMom_id;
   double vb_px,vb_py,vb_pz,vb_e,vb_mass;
   TLorentzVector vb;
 
-  mdi.Branch("nvb",&nvb,"nvb/I");
-  mdi.Branch("mesonMomID",&mesonMomID,"mesonMomID/I");
-  mdi.Branch("pi0ID",&pi0ID,"pi0ID/I");
+  mdi.Branch("event_num",&event_num,"event_num/I"); // Event number
+  mdi.Branch("unique_vb",&unique_vb,"unique_vb/I"); // # to track VB
+  mdi.Branch("meson2vb",&meson2vb,"meson2vb/I"); // Links meson to VB
+  mdi.Branch("pi02vb",&pi02vb,"pi02vb/I"); // Links Pi0 to VB
+  mdi.Branch("mesonMom_id",&mesonMom_id,"mesonMom_id/I");
   mdi.Branch("vb_px",&vb_px,"vb_px/D");
   mdi.Branch("vb_py",&vb_py,"vb_py/D");
   mdi.Branch("vb_pz",&vb_pz,"vb_pz/D");
@@ -40,6 +43,8 @@ void MediatorDetectorIntercept::MDI()
   mdi.Branch("vb",&vb); // VB 4-vector
 
   Int_t entries = (Int_t)ms->GetEntries();
+
+  std::cout << "Only save mediators which intercept the detector." << std::endl;
 
   for(Int_t i=0; i<entries; i++)
     {
@@ -60,9 +65,12 @@ void MediatorDetectorIntercept::MDI()
 	{
 	  if(VB_Py_temp/VB_Pz_temp < ydist[j]/frontend[j])
 	    {
-	      mesonMomID = mesonMother_id;
-	      pi0ID = Pi0_id;
-
+	      // Assign TBranches
+	      event_num = eventNUM;
+	      unique_vb = UniqueVB;
+	      meson2vb = MesonToVB;
+	      pi02vb = Pi0ToVB;
+	      mesonMom_id = mesonMother_id;
 	      vb_px = VB_PX;
 	      vb_py = VB_PY;
 	      vb_pz = VB_PZ;

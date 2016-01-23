@@ -21,6 +21,7 @@
 #include <TNtuple.h>
 #include <TH1F.h>
 #include <TH2F.h>
+#include <TLorentzVector.h>
 
 /**
    \class SanityPlots
@@ -37,7 +38,11 @@ public:
   /// Default destructor
   ~SanityPlots(){}
 
-  void Check();
+  void CheckNMP(); // Neutral meson production
+  void CheckMP(); // Mediator production
+  void CheckMS(); // Mediator selection
+  void CheckMDI(); // Mediator detector intercept
+  void CheckMD(); // Mediator decay
 };
 
 #endif

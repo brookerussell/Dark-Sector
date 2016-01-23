@@ -17,14 +17,14 @@ void MediatorProduction::MP()
   TTree *nmp = (TTree*)f->Get("nmp");
   
   // Instantiating variables to read the meson ntuple
-  int uniquePi0,Pi0Meson,nMesons;
+  int eventnum,uniqueMeson,Pi0ToMeson;
   float mesonID,mesonMass;
   double mesonPx,mesonPy,mesonPz,mesonE;  
 
   // Grabbing the branches from TFile f for the meson
-  nmp->SetBranchAddress("uniquePi0",&uniquePi0);
-  nmp->SetBranchAddress("Pi0Meson",&Pi0Meson);
-  nmp->SetBranchAddress("nMesons",&nMesons);
+  nmp->SetBranchAddress("eventnum",&eventnum);
+  nmp->SetBranchAddress("uniqueMeson",&uniqueMeson);
+  nmp->SetBranchAddress("Pi0ToMeson",&Pi0ToMeson);
   nmp->SetBranchAddress("mesonID",&mesonID);
   nmp->SetBranchAddress("mesonPx",&mesonPx);
   nmp->SetBranchAddress("mesonPy",&mesonPy);
@@ -35,18 +35,16 @@ void MediatorProduction::MP()
   TFile* fout = TFile::Open("MediatorProduction_output.root","RECREATE");
   TTree mp("mp","");
 
-  int uniqueVB,nVbosons;
-  int mesonMotherID,Pi0_identifier,Pi0Meson_identifier,Pi0VB_identifier; 
+  int eventNum,uniqueVB,mesonTOvb,pi0TOvb,mesonMotherID;
   double omass,VB_mass;
   double VB_Px,VB_Py,VB_Pz,VB_E;
   TLorentzVector meson_lf,VectorBoson,Photon;
   
-  mp.Branch("uniqueVB",&uniqueVB,"uniqueVB/I");
-  mp.Branch("nVbosons",&nVbosons,"nVbosons/I"); // # of newly created mediators
-  mp.Branch("mesonMotherID",&mesonMotherID,"mesonMotherID/I");
-  mp.Branch("Pi0_identifier",&Pi0_identifier,"Pi0_identifier/I");
-  mp.Branch("Pi0Meson_identifier",&Pi0Meson_identifier,"Pi0Meson_identifier/I");
-  mp.Branch("Pi0VB_identifier",&Pi0VB_identifier,"Pi0VB_identifier/I");
+  mp.Branch("eventNum",&eventNum,"eventNum/I"); // Event number
+  mp.Branch("uniqueVB",&uniqueVB,"uniqueVB/I"); // # to track VB
+  mp.Branch("mesonTOvb",&mesonTOvb,"mesonTOvb/I"); // Links meson to VB
+  mp.Branch("pi0TOvb",&pi0TOvb,"pi0TOvb/I"); // Links Pi0 to VB
+  mp.Branch("mesonMotherID",&mesonMotherID,"mesonMotherID/I"); 
   mp.Branch("omass",&omass,"omass/D"); // Meson mother mass 
   mp.Branch("meson_lf",&meson_lf); // meson 4-vector
   mp.Branch("VectorBoson",&VectorBoson); // VB 4-vector
@@ -60,17 +58,18 @@ void MediatorProduction::MP()
   Int_t mentries = (Int_t)nmp->GetEntries(); // Grabbing the # of events (POT)
   
   int ctr = 0; //Instantiate counter for unique vector boson
-  double VB_P;
 
-  std::cout << "Making the mediator from neutral mesons. " << std::endl;
+  std::cout << "START mediator production."<<std::endl;
 
-  //for(Int_t i=0; i<mentries; i++) // Looping over all events
-  for(Int_t i=0; i<10; i++)
+  //  for(Int_t i=0; i<mentries; i++) // Looping over all events
+  for(Int_t i=0; i<10000; i++)   
     {
-      //if(i % 1000 == 0){std::cout<<"Event = "<<i<<std::endl;} 
+      // if(i % 1000 == 0){std::cout<<"Event = "<<i<<std::endl;} 
      
-      nmp->GetEntry(i);
+      nmp->GetEntry(i); 
   
+      eventNum = eventnum; // Catalogue event number
+
       meson_lf.SetPxPyPzE(mesonPx,
 			  mesonPy,
 			  mesonPz,
@@ -106,26 +105,20 @@ void MediatorProduction::MP()
 						 (VectorBoson[1]*VectorBoson[1]) +
 						 (VectorBoson[2]*VectorBoson[2]) ) );
 		      
-		  // Setting the output file branches
+		  ctr++;
+		  // Assign TBranches
 		  VB_Px = VectorBoson[0];
 		  VB_Py = VectorBoson[1];
 		  VB_Pz = VectorBoson[2];
 		  VB_E  = VectorBoson[3];
-
 		  VB_mass = VBinvMassAfter;
-
+		  omass = mesonMass; // Meson mother mass in GeV
+		  mesonMotherID = mesonID; // Meson mother particle ID (1-5)
+		  uniqueVB = ctr; // Unique # to track each vector boson
+		  mesonTOvb = uniqueMeson; // Links VB to meson mother
+		  pi0TOvb = Pi0ToMeson; // Links VB to Pi0 grandmother
 		  
-		  omass = mesonMass;
-		  mesonMotherID = mesonID;
-
-		  Pi0_identifier = uniquePi0;
-		  Pi0Meson_identifier = Pi0Meson;
-		  Pi0VB_identifier = uniquePi0;
-
-		  ctr++;
-		  uniqueVB = ctr;
-		  
-		  mp.Fill();
+		  mp.Fill(); // Fill tree
 
 		  //Clear all 4-momenta, otherwise a segfault will result
 		  meson_lf.Clear();
@@ -134,6 +127,7 @@ void MediatorProduction::MP()
 		} // <-- end if
 	    } // <-- end m for loop
 	} // <-- end eta/eta' if
+
       if(mesonID == 2 || mesonID == 3 || mesonID == 5)
 	{
 	  // Looping over mass ranges in 10 MeV steps
@@ -150,7 +144,7 @@ void MediatorProduction::MP()
 		{
 		  // 3-momentum of the new vector boson; 
 		  // p = sqrt(E^2 - m^2) ###
-		  VB_P = sqrt((iE*iE)-(n*n));
+		  double VB_P = sqrt((iE*iE)-(n*n));
 		   
 		  // Energy of the new vector boson;
 		  // E =  sqrt(P^2 - m^2) ###
@@ -171,24 +165,23 @@ void MediatorProduction::MP()
 					 VB_Py,
 					 VB_Pz,
 					 VB_E);
+		  ctr++;
 		  VB_mass = invMass;
 		  omass = mesonMass;
 		  mesonMotherID = mesonID;
-
-		  Pi0_identifier = uniquePi0;
-                  Pi0Meson_identifier = Pi0Meson;
-                  Pi0VB_identifier = uniquePi0;
-
-		  ctr++;
-                  uniqueVB = ctr;
+		  uniqueVB = ctr; // Unique # to track each vector boson
+                  mesonTOvb = uniqueMeson; // Links VB to meson mother
+		  pi0TOvb = Pi0ToMeson; // Links VB to Pi0 grandmother 
 		  		    
-		  mp.Fill();
+		  mp.Fill(); // Fill tree
+
 		} // <-- if energy^2 is greater than mesonMass^2
 	    } // <-- end n loop 
 	} // <-- end if meson #2,3,5
-      
+    } // <-- end i loop 
 
-} // <-- end i loop 
+  std::cout<<"MADE vector boson mediators from neutral mesons."<<std::endl;
+
   f->Close();
   fout->Write();
 }

@@ -107,7 +107,7 @@ namespace ROOT {
       ::SanityPlots *ptr = 0;
       static ::TVirtualIsAProxy* isa_proxy = new ::TIsAProxy(typeid(::SanityPlots));
       static ::ROOT::TGenericClassInfo 
-         instance("SanityPlots", "SanityPlots.h", 30,
+         instance("SanityPlots", "SanityPlots.h", 31,
                   typeid(::SanityPlots), DefineBehavior(ptr, ptr),
                   &SanityPlots_Dictionary, isa_proxy, 4,
                   sizeof(::SanityPlots) );
@@ -456,7 +456,7 @@ namespace {
     };
     static const char* includePaths[] = {
 "/Users/br/BasicSoftware/root-6.04.12/include",
-"/Users/br/BasicSoftware/larlite/UserDev/DarkSector/MediatorVisibleDecay/",
+"/Users/br/BasicSoftware/larlite/UserDev/Dark-Sector/MediatorVisibleDecay/",
 0
     };
     static const char* fwdDeclCode = 
